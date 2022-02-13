@@ -1,8 +1,8 @@
 /*******************************************************************************
  * @file    tms9928.c
+ * @brief   Library for TI video display processor.
  * @author  Jay Convertino(electrobs@gmail.com)
  * @date    2022.02.12
- * @brief   Library for tms9928 sound chip.
  * 
  * @license mit
  * 
