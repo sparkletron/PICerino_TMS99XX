@@ -32,29 +32,27 @@
 
 #include <tms9928.h>
 
-/** DEFINES **/
-#define VOICE1_FREQ 0
-#define VOICE2_FREQ 2
-#define VOICE3_FREQ 1
-#define VOICE1_ATTN 4
-#define VOICE2_ATTN 6
-#define VOICE3_ATTN 5
-#define NOISE_CTRL  3
-#define NOISE_ATTN  7
-#define FIRST_BYTE  0x01
-#define SECOND_BYTE 0x00
-#define REG_SHIFT   1
-
 /** SEE MY PRIVATES **/
+/*** read VDP status register ***/
 uint8_t readVDPstatus(struct s_tms9928 *p_tms9928);
+/*** read VDP vram ***/
 uint8_t readVDPvram(struct s_tms9928 *p_tms9928);
+/*** write VDP vram ***/
 void writeVDPvram(struct s_tms9928 *p_tms9928, uint8_t data);
+/*** write VDP registers ***/
 void writeVDPregister(struct s_tms9928 *p_tms9928, uint8_t regNum, uint8_t data);
+/*** graphics mode I ***/
 void initVDPgfxI(struct s_tms9928 *p_tms9928);
+/*** graphics mode II ***/
 void initVDPgfxII(struct s_tms9928 *p_tms9928);
+/*** bitmap ***/
 void initVDPbmp(struct s_tms9928 *p_tms9928);
+/*** text ***/
 void initVDPtxt(struct s_tms9928 *p_tms9928);
+/*** reset vdp ***/
 void resetVDP(struct s_tms9928 *p_tms9928);
+/*** clear vdp ram ***/
+void clearVDPvram(struct s_tms9928 *p_tms9928);
 
 /** INITIALIZE AND FREE MY STRUCTS **/
 
@@ -68,84 +66,108 @@ void initTMS9928(struct s_tms9928 *p_tms9928, uint8_t vdpMode, volatile unsigned
 {
 }
 
+/*** Set the TMS9928 mode to one of 4. Text, Graphics I, Graphics II, and bitmap. ***/
 void setTMS9928mode(struct s_tms9928 *p_tms9928, uint8_t vdpMode)
 {
 }
 
+/*** Set a register with a 8 bit value. ***/
 void setTMS9928reg(struct s_tms9928 *p_tms9928, uint8_t regNum, uint8_t regData)
 {
 }
 
+/*** Set the start of the VRAM address to read or write to. After this is set read or writes will auto increment the address. ***/
 void setTMS9928vramAddr(struct s_tms9928 *p_tms9928, uint16_t vramAddr)
 {
 }
 
-void setTMS9928pattern(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t size)
+/*** Write a pattern or patterns into vram pattern table. Alighned to pattern data size. ***/
+void setTMS9928pattern(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number)
 {
 }
 
-void setTMS9928name(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t size)
+/*** Write a name or names into vram name table. Aligned to name table size. ***/
+void setTMS9928name(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number)
 {
 }
 
-void setTMS9928color(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t size)
+/*** Write a color or colors into vram color table. Aligned to color table size. ***/
+void setTMS9928color(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number)
 {
 }
 
-void setTMS9928spritePattern(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t size)
+/*** Write a sprite pattern or sprite patterns into vram color table. Aligned to sprite pattern table size. ***/
+void setTMS9928spritePattern(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number)
 {
 }
 
-void setTMS9928spriteAttribute(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t size)
+/*** Write a sprite attribute or sprite attributes into vram color table. Aligned to sprite attribute table size. ***/
+void setTMS9928spriteAttribute(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number)
 {
 }
 
+/*** Write array of byte data to VRAM. ***/
 void setTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t *p_data, uint8_t size)
 {
 }
 
+/*** Read array of byte data to VRAM. ***/
 uint8_t *getTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t size)
 {
 }
 
+/*** Read status register of VDP. ***/
 uint8_t *getTMS9928status(struct s_tms9928 *p_tms9928)
 {
 }
 
 /** SEE MY PRIVATES **/
+/*** read VDP status register ***/
 uint8_t readVDPstatus(struct s_tms9928 *p_tms9928)
 {
 }
 
-
+/*** read VDP vram ***/
 uint8_t readVDPvram(struct s_tms9928 *p_tms9928)
 {
 }
 
+/*** write VDP vram ***/
 void writeVDPvram(struct s_tms9928 *p_tms9928, uint8_t data)
 {
 }
 
+/*** write VDP registers ***/
 void writeVDPregister(struct s_tms9928 *p_tms9928, uint8_t regNum, uint8_t data)
 {
 }
 
+/*** graphics mode I ***/
 void initVDPgfxI(struct s_tms9928 *p_tms9928)
 {
 }
 
+/*** graphics mode II ***/
 void initVDPgfxII(struct s_tms9928 *p_tms9928)
 {
 }
 
+/*** bitmap mode ***/
 void initVDPbmp(struct s_tms9928 *p_tms9928)
 {
 }
 
+/*** text ***/
 void initVDPtxt(struct s_tms9928 *p_tms9928)
 {
 }
 
+/*** reset vdp ***/
 void resetVDP(struct s_tms9928 *p_tms9928)
+{
+}
+
+/*** clear vdp ram ***/
+void clearVDPvram(struct s_tms9928 *p_tms9928)
 {
 }
