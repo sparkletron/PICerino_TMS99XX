@@ -1,4 +1,4 @@
-# TMS9928 Sound IC library
+# TMS9928 Video Display Processor Library
 
 Software Library for TI TMS9928 video display processors.  
 
