@@ -3,7 +3,15 @@
  * @brief   Library for TI video display processor.
  * @author  Jay Convertino(electrobs@gmail.com)
  * @date    2022.02.12
- * @details OH SO MANY
+ * @details VDP default is:
+ *          1 = nCSR
+ *          1 = nCSW
+ *          0 = MODE
+ *          0 = dataTRIS (all data lines are output).
+ *          This allows for mode setting and data direction setting to be
+ *          skipped.
+ *          16K is assumed for memory.
+ * 
  * @version 0.0.1
  * 
  * @TODO
@@ -38,73 +46,156 @@
 #include <xc.h>
 #include <stdint.h>
 
+/** DEFINES **/
+/** VDP MODE DEFINES **/
 /**
- * @def PATTERN_TABLE
- * pattern table start address
+ * @def GFXI_MODE
+ * mode bit for graphics I mode
  */
-#define PATTERN_TABLE           0x00
+#define GFXI_MODE 0
 /**
- * @def NAME_TABLE
- * name table start address
+ * @def GFXII_MODE
+ * mode bit for graphics II mode
  */
-#define NAME_TABLE              0x00
+#define GFXII_MODE 1
 /**
- * @def COLOR_TABLE
- * color table start address
+ * @def BMP_MODE
+ * mode bit for bitmap(multicolor) mode
  */
-#define COLOR_TABLE             0x00
+#define BMP_MODE 2
 /**
- * @def SPRITE_ATTRIBUTE_TABLE
- * sprite attribute table start address
+ * @def TXT_MODE
+ * mode bit for text mode
  */
-#define SPRITE_ATTRIBUTE_TABLE  0x00
-/**
- * @def SPRITE_PATTERN_TABLE
- * sprite pattern table start address
- */
-#define SPRITE_PATTERN_TABLE    0x00
+#define TXT_MODE 4
 
+/** register 1 bit defines **/
+/**
+ * @def MEM_AMT_BIT
+ * amount of memory bit
+ */
+#define MEM_AMT_BIT 7
+/**
+ * @def BLK_SCRN_BIT
+ * blank screen bit
+ */
+#define BLK_SCRN_BIT 6
+/**
+ * @def IRQ_BIT
+ * IRQ bit number
+ */
+#define IRQ_BIT 5
+/**
+ * @def SPRITE_SIZE_BIT
+ * sprite size bit
+ */
+#define SPRITE_SIZE_BIT 1
+/**
+ * @def SPRITE_MAG_BIT
+ * sprite magnification bit
+ */
+#define SPRITE_MAG_BIT 0
+
+/** REGISTER DEFINES **/
 /**
  * @def REGISTER_0
- * register
+ * mode and external video bits
  */
 #define REGISTER_0 0
 /**
  * @def REGISTER_1
- * register
+ * mode, sprite, interrupt, blank, and memory bits.
  */
 #define REGISTER_1 1
 /**
  * @def REGISTER_2
- * register
+ * name table address
  */
 #define REGISTER_2 2
 /**
  * @def REGISTER_3
- * register
+ * color table address
  */
 #define REGISTER_3 3
 /**
  * @def REGISTER_4
- * register
+ * pattern table address
  */
 #define REGISTER_4 4
 /**
  * @def REGISTER_5
- * register
+ * sprite attribute address
  */
 #define REGISTER_5 5
 /**
  * @def REGISTER_6
- * register
+ * sprite pattern address
  */
 #define REGISTER_6 6
 /**
  * @def REGISTER_7
- * register
+ * background, text color
  */
 #define REGISTER_7 7
 
+/** VRAM ADDRESS DEFINES **/
+/**
+ * @def NAME_TABEL_ADDR
+ * default address for name table (R2 * 0x400[2^10])
+ * 0x3800 address is set when R2 is 0x0E
+ */
+#define NAME_TABEL_ADDR 0x3800
+/**
+ * @def NAME_TABEL_ADDR_SCALE
+ * value to scale the name table address
+ */
+#define NAME_TABEL_ADDR_SCALE 0x400
+/**
+ * @def COLOR_TABEL_ADDR
+ * default address for color table (R3 * 0x40[2^6])
+ * 0x2000 address is set when R3 is 0x80 (GFXII constrains this to FF!!)
+ */
+#define COLOR_TABEL_ADDR 0x2000
+/**
+ * @def COLOR_TABEL_ADDR_SCALE
+ * value to scale the color table address
+ */
+#define COLOR_TABEL_ADDR_SCALE 0x40
+/**
+ * @def PATTERN_TABEL_ADDR
+ * default address for pattern table (R4 * 0x800[2^11])
+ * 0x0000 address is set when R4 is 0x00 (GFX constrains this to 0x03)
+ */
+#define PATTERN_TABEL_ADDR 0x0000
+/**
+ * @def PATTERN_TABEL_ADDR_SCALE
+ * value to scale the pattern table address
+ */
+#define PATTERN_TABEL_ADDR_SCALE 0x800
+/**
+ * @def SPRITE_ATTRIBUTE_TABEL_ADDR
+ * default address for sprite attribute table (R5 * 0x80[2^7])
+ * 0x3B00 address is set when R5 is 0x76
+ */
+#define SPRITE_ATTRIBUTE_TABEL_ADDR 0x3B00
+/**
+ * @def SPRITE_ATTRIBUTE_TABEL_ADDR_SCALE
+ * value to scale the sprite attribute address
+ */
+#define SPRITE_ATTRIBUTE_TABEL_ADDR_SCALE 0x80
+/**
+ * @def SPRITE_PATTERN_TABEL_ADDR
+ * default address for sprite pattern table (R6 * 0x800[2^11])
+ * 0x1800 address is set when R6 is 0x03
+ */
+#define SPRITE_PATTERN_TABEL_ADDR 0x1800
+/**
+ * @def SPRITE_PATTERN_TABEL_ADDR_SCALE
+ * value to scale the sprite attribute address
+ */
+#define SPRITE_PATTERN_TABEL_ADDR_SCALE 0x800
+
+/** COLOR DEFINES **/
 /**
  * @def TMS_TRANSPARENT
  * transparent for all plans/sprites
@@ -186,6 +277,7 @@
  */
 #define TMS_WHITE 0xF
 
+/** DATA STRUCTURES **/
 /**
  * @struct s_tms9928
  * @brief Struct for containing TMS9928 instances 
@@ -242,6 +334,26 @@ struct s_tms9928
    * color table address in VRAM
    */
   uint16_t colorTableAddr;
+    /**
+   * @var s_tms9928::vdpMode
+   * contains current mode of the VDP
+   */
+  uint8_t vdpMode;
+  /**
+   * @var s_tms9928::register0
+   * register 0 contents
+   */
+  uint8_t register0;
+  /**
+   * @var s_tms9928::register1
+   * register 1 contents
+   */
+  uint8_t register1;
+  /**
+   * @var s_tms9928::colorReg
+   * color sent to register 7, background/text color.
+   */
+  uint8_t colorReg;
   /**
    * @var s_tms9928::nCSR
    * active low read enable pin number
@@ -504,6 +616,8 @@ union u_tms9928_spriteAttributeTable
   uint8_t data[4];
 };
 
+/** METHODS **/
+
 /***************************************************************************//**
  * @brief   Initialize TMS9928 ports for correct I/O and set pin numbers
  * 
@@ -521,26 +635,86 @@ void initTMS9928port(struct s_tms9928 *p_tms9928, volatile unsigned char *p_data
 
 /***************************************************************************//**
  * @brief   Initialize TMS9928 struct with ports to use for input output, must match
- * direction registers above.
+ * direction registers above. Register 1 can be set to any default values. Memory
+ * addresses will match defines. These could be changed latter and then the
+ * setTMS9928mode run for custom settings on the fly. Better option is to change
+ * the defines in this headed to your use case.
  * 
  * @param   p_tms9928 pointer to struct to contain port data.
  * @param   vdpMode select what mode the VDP is initialized to.
+ * @param   register1 change contents of register one (M1/M2 will be overwritten
+ *          by vdpMode). 7 = MEM, 6 = BLK, 5 = IRQ, 1 = SPRITE SIZE, 0 = SPRITE
+ *          MAGNIFICATION
+ * @param   txtColor set text color to a 4 bit value.
+ * @param   backColor set background color to a 4 bit value.
  * @param   p_dataPortW pointer to data output port.
  * @param   p_dataPortR pointer to data input port.
  * @param   p_ctrlPortW pointer to control output port.
  * @param   p_intPortR pointer to interrupt input port.
  ******************************************************************************/
-void initTMS9928(struct s_tms9928 *p_tms9928, uint8_t vdpMode, volatile unsigned char *p_dataPortW, volatile unsigned char *p_dataPortR, volatile unsigned char *p_ctrlPortW, volatile unsigned char *p_intPortR);
+void initTMS9928(struct s_tms9928 *p_tms9928, uint8_t vdpMode, uint8_t register1, uint8_t txtColor, uint8_t backColor, volatile unsigned char *p_dataPortW, volatile unsigned char *p_dataPortR, volatile unsigned char *p_ctrlPortW, volatile unsigned char *p_intPortR);
 
 /***************************************************************************//**
  * @brief   Set the TMS9928 mode to one of 4. Text, Graphics I, Graphics II,
- * and bitmap.
+ * and bitmap. This will also reset all addresses, and will set register 1 to
+ * new specified values.
  * 
  * @param   p_tms9928 pointer to struct to contain port data.
  * @param   vdpMode set or change the mode, 0 = Graphics I, 1 = Graphics II, 
- *          2 = bitmap, 3 = Text.
+ *          2 = bitmap, 4 = Text.
+ * @param   register1 change contents of register one (M1/M2 will be overwritten
+ *          by vdpMode). 7 = MEM, 6 = BLK, 5 = IRQ, 1 = SPRITE SIZE, 0 = SPRITE
+ *          MAGNIFICATION
  ******************************************************************************/
-void setTMS9928mode(struct s_tms9928 *p_tms9928, uint8_t vdpMode);
+void setTMS9928mode(struct s_tms9928 *p_tms9928, uint8_t vdpMode, uint8_t register1);
+
+/***************************************************************************//**
+ * @brief   Set the TMS9928 to blank the current sprite and pattern planes.
+ * 
+ * @param   p_tms9928 pointer to struct to contain port data.
+ * @param   mode 0 is off, anything else is on.
+ ******************************************************************************/
+void setTMS9928blank(struct s_tms9928 *p_tms9928, uint8_t mode);
+
+/***************************************************************************//**
+ * @brief   Set the TMS9928 to irq to enabled or disabled.
+ * 
+ * @param   p_tms9928 pointer to struct to contain port data.
+ * @param   mode 0 is off, anything else is on.
+ ******************************************************************************/
+void setTMS9928irq(struct s_tms9928 *p_tms9928, uint8_t mode);
+
+/***************************************************************************//**
+ * @brief   Set the TMS9928 to sprite size to 8x8 or 16x16.
+ * 
+ * @param   p_tms9928 pointer to struct to contain port data.
+ * @param   mode 0 is 8x8, anything else is 16x16.
+ ******************************************************************************/
+void setTMS9928spriteSize(struct s_tms9928 *p_tms9928, uint8_t mode);
+
+/***************************************************************************//**
+ * @brief   Set the TMS9928 to sprite magnify to on or off (double set size).
+ * 
+ * @param   p_tms9928 pointer to struct to contain port data.
+ * @param   mode 0 is off, anything else is double sprite size.
+ ******************************************************************************/
+void setTMS9928spriteMagnify(struct s_tms9928 *p_tms9928, uint8_t mode);
+
+/***************************************************************************//**
+ * @brief   Set the TMS9928 text color in text mode.
+ * 
+ * @param   p_tms9928 pointer to struct to contain port data.
+ * @param   color 4 bit color value.
+ ******************************************************************************/
+void setTMS9928txtColor(struct s_tms9928 *p_tms9928, uint8_t color);
+
+/***************************************************************************//**
+ * @brief   Set the TMS9928 background color.
+ * 
+ * @param   p_tms9928 pointer to struct to contain port data.
+ * @param   color 4 bit color value.
+ ******************************************************************************/
+void setTMS9928backgroundColor(struct s_tms9928 *p_tms9928, uint8_t color);
 
 /***************************************************************************//**
  * @brief   Set a register with a 8 bit value.
@@ -619,19 +793,19 @@ void setTMS9928spriteAttribute(struct s_tms9928 *p_tms9928, uint8_t startNum, ui
  * @brief   Write array of byte data to VRAM.
  * 
  * @param   p_tms9928 pointer to struct to contain port data.
- * @param   p_data pointer to data struct contains bytes.
+ * @param   p_data pointer to data struct that write data.
  * @param   size number of bytes to write to VRAM.
  ******************************************************************************/
-void setTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t *p_data, uint8_t size);
+void setTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size);
 
 /***************************************************************************//**
  * @brief   Read array of byte data to VRAM.
  * 
  * @param   p_tms9928 pointer to struct to contain port data.
+ * @param   p_data pointer to data struct to store read data.
  * @param   size number of bytes to read from vram.
- * @return  Array of bytes from VRAM
  ******************************************************************************/
-uint8_t *getTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t size);
+void getTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size);
 
 /***************************************************************************//**
  * @brief   Read status register of VDP.
@@ -639,6 +813,6 @@ uint8_t *getTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t size);
  * @param   p_tms9928 pointer to struct to contain port data.
  * @return  Status register data byte.
  ******************************************************************************/
-uint8_t *getTMS9928status(struct s_tms9928 *p_tms9928);
+uint8_t getTMS9928status(struct s_tms9928 *p_tms9928);
 
 #endif
