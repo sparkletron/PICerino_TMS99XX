@@ -726,6 +726,19 @@ void setTMS9928backgroundColor(struct s_tms9928 *p_tms9928, uint8_t color);
 void setTMS9928reg(struct s_tms9928 *p_tms9928, uint8_t regNum, uint8_t regData);
 
 /***************************************************************************//**
+ * @brief   Write a pattern or patterns into vram pattern table. Alighned to 
+ * pattern data size.
+ * 
+ * @param   p_tms9928 pointer to struct to contain port data.
+ * @param   tableAddr table start address, exe p_tms9928->spriteAttributeAddr
+ * @param   p_data void pointer data array that contains pattern data objects.
+ * @param   startNum adds a offset to the base vram address.
+ * @param   number quantity of patterns to write linearly.
+ * @param   size of the data members in the table (all tables of member data, sizeof(data))
+ ******************************************************************************/
+void setTMS9928vramTableData(struct s_tms9928 *p_tms9928, uint16_t tableAddr, void *p_data, uint8_t startNum, uint8_t number, uint8_t size);
+
+/***************************************************************************//**
  * @brief   Set the start of the VRAM address to read or write to. After this
  * is set read or writes will auto increment the address.
  * 
@@ -735,77 +748,22 @@ void setTMS9928reg(struct s_tms9928 *p_tms9928, uint8_t regNum, uint8_t regData)
 void setTMS9928vramAddr(struct s_tms9928 *p_tms9928, uint16_t vramAddr);
 
 /***************************************************************************//**
- * @brief   Write a pattern or patterns into vram pattern table. Alighned to 
- * pattern data size.
- * 
- * @param   p_tms9928 pointer to struct to contain port data.
- * @param   startNum adds a offset to the base vram address.
- * @param   p_data data array that contains pattern data objects.
- * @param   number quantity of patterns to write linearly.
- ******************************************************************************/
-void setTMS9928pattern(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number);
-
-/***************************************************************************//**
- * @brief   Write a name or names into vram name table. Aligned to name table
- * size.
- * 
- * @param   p_tms9928 pointer to struct to contain port data.
- * @param   startNum adds a offset to the base vram address. 
- * @param   p_data data array that contains name data objects.
- * @param   number quantity of name data to write linearly.
- ******************************************************************************/
-void setTMS9928name(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number);
-
-/***************************************************************************//**
- * @brief   Write a color or colors into vram color table. Aligned to color table
- * size.
- * 
- * @param   p_tms9928 pointer to struct to contain port data.
- * @param   startNum adds a offset to the base vram address. 
- * @param   p_data data array that contains color data objects.
- * @param   number quantity of color data to write linearly.
- ******************************************************************************/
-void setTMS9928color(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number);
-
-/***************************************************************************//**
- * @brief   Write a sprite pattern or sprite patterns into vram color table.
- * Aligned to sprite pattern table size.
- * 
- * @param   p_tms9928 pointer to struct to contain port data.
- * @param   startNum adds a offset to the base vram address. 
- * @param   p_data data array that contains sprite pattern data objects.
- * @param   number quantity of sprite pattern data to write linearly.
- ******************************************************************************/
-void setTMS9928spritePattern(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number);
-
-/***************************************************************************//**
- * @brief   Write a sprite attribute or sprite attributes into vram color table.
- * Aligned to sprite attribute table size.
- * 
- * @param   p_tms9928 pointer to struct to contain port data.
- * @param   startNum adds a offset to the base vram address. 
- * @param   p_data data array that contains sprite attribute data objects.
- * @param   number quantity of sprite attribute data to write linearly.
- ******************************************************************************/
-void setTMS9928spriteAttribute(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number);
-
-/***************************************************************************//**
  * @brief   Write array of byte data to VRAM.
  * 
  * @param   p_tms9928 pointer to struct to contain port data.
- * @param   p_data pointer to data struct that write data.
+ * @param   p_data pointer to data to write to vdp.
  * @param   size number of bytes to write to VRAM.
  ******************************************************************************/
-void setTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size);
+void setTMS9928vramData(struct s_tms9928 *p_tms9928, void *p_data, int size);
 
 /***************************************************************************//**
  * @brief   Read array of byte data to VRAM.
  * 
  * @param   p_tms9928 pointer to struct to contain port data.
- * @param   p_data pointer to data struct to store read data.
+ * @param   p_data pointer to data to store read data.
  * @param   size number of bytes to read from vram.
  ******************************************************************************/
-void getTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size);
+void getTMS9928vramData(struct s_tms9928 *p_tms9928, void *p_data, int size);
 
 /***************************************************************************//**
  * @brief   Read status register of VDP.

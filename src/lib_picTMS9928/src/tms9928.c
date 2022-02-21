@@ -259,47 +259,41 @@ void setTMS9928reg(struct s_tms9928 *p_tms9928, uint8_t regNum, uint8_t regData)
   writeVDPregister(p_tms9928, regNum, regData);
 }
 
+/*** Write a struct/union table to vram using address. Alighned to data size. ***/
+void setTMS9928vramTableData(struct s_tms9928 *p_tms9928, uint16_t tableAddr, void *p_data, uint8_t startNum, uint8_t number, uint8_t size)
+{
+  int index = 0;
+  /**** NULL Check ****/
+  if(!p_tms9928) return;
+  
+  if(!p_data) return;
+  
+  //disable interrupt
+  
+  /**** set starting vram address to write too ****/
+  writeVDPvramAddr(p_tms9928, tableAddr + (size * startNum));
+  
+  writeVDPvram(p_tms9928, (uint8_t *)p_data, size * number);
+  
+  //enable interrupt
+}
+
 /*** Set the start of the VRAM address to read or write to. After this is set read or writes will auto increment the address. ***/
 void setTMS9928vramAddr(struct s_tms9928 *p_tms9928, uint16_t vramAddr)
 {
   writeVDPvramAddr(p_tms9928, vramAddr);
 }
 
-/*** Write a pattern or patterns into vram pattern table. Alighned to pattern data size. ***/
-void setTMS9928pattern(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number)
-{
-}
-
-/*** Write a name or names into vram name table. Aligned to name table size. ***/
-void setTMS9928name(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number)
-{
-}
-
-/*** Write a color or colors into vram color table. Aligned to color table size. ***/
-void setTMS9928color(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number)
-{
-}
-
-/*** Write a sprite pattern or sprite patterns into vram color table. Aligned to sprite pattern table size. ***/
-void setTMS9928spritePattern(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number)
-{
-}
-
-/*** Write a sprite attribute or sprite attributes into vram color table. Aligned to sprite attribute table size. ***/
-void setTMS9928spriteAttribute(struct s_tms9928 *p_tms9928, uint8_t startNum, uint8_t *p_data, uint8_t number)
-{
-}
-
 /*** Write array of byte data to VRAM. ***/
-void setTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size)
+void setTMS9928vramData(struct s_tms9928 *p_tms9928, void *p_data, int size)
 {
-  writeVDPvram(p_tms9928, p_data, size);
+  writeVDPvram(p_tms9928, (uint8_t *)p_data, size);
 }
 
 /*** Read array of byte data to VRAM. ***/
-void getTMS9928vramData(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size)
+void getTMS9928vramData(struct s_tms9928 *p_tms9928, void *p_data, int size)
 {
-  readVDPvram(p_tms9928, p_data, size);
+  readVDPvram(p_tms9928, (uint8_t *)p_data, size);
 }
 
 /*** Read status register of VDP. ***/
