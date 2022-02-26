@@ -149,7 +149,7 @@
  * @def NAME_TABEL_ADDR_SCALE
  * value to scale the name table address
  */
-#define NAME_TABEL_ADDR_SCALE 0x400
+#define NAME_TABEL_ADDR_SCALE 10
 /**
  * @def COLOR_TABEL_ADDR
  * default address for color table (R3 * 0x40[2^6])
@@ -160,7 +160,7 @@
  * @def COLOR_TABEL_ADDR_SCALE
  * value to scale the color table address
  */
-#define COLOR_TABEL_ADDR_SCALE 0x40
+#define COLOR_TABEL_ADDR_SCALE 6
 /**
  * @def PATTERN_TABEL_ADDR
  * default address for pattern table (R4 * 0x800[2^11])
@@ -171,7 +171,7 @@
  * @def PATTERN_TABEL_ADDR_SCALE
  * value to scale the pattern table address
  */
-#define PATTERN_TABEL_ADDR_SCALE 0x800
+#define PATTERN_TABEL_ADDR_SCALE 11
 /**
  * @def SPRITE_ATTRIBUTE_TABEL_ADDR
  * default address for sprite attribute table (R5 * 0x80[2^7])
@@ -182,7 +182,7 @@
  * @def SPRITE_ATTRIBUTE_TABEL_ADDR_SCALE
  * value to scale the sprite attribute address
  */
-#define SPRITE_ATTRIBUTE_TABEL_ADDR_SCALE 0x80
+#define SPRITE_ATTRIBUTE_TABEL_ADDR_SCALE 7
 /**
  * @def SPRITE_PATTERN_TABEL_ADDR
  * default address for sprite pattern table (R6 * 0x800[2^11])
@@ -193,7 +193,7 @@
  * @def SPRITE_PATTERN_TABEL_ADDR_SCALE
  * value to scale the sprite attribute address
  */
-#define SPRITE_PATTERN_TABEL_ADDR_SCALE 0x800
+#define SPRITE_PATTERN_TABEL_ADDR_SCALE 11
 
 /** COLOR DEFINES **/
 /**
@@ -641,7 +641,8 @@ void initTMS9928port(struct s_tms9928 *p_tms9928, volatile unsigned char *p_data
  * the defines in this headed to your use case.
  * 
  * @param   p_tms9928 pointer to struct to contain port data.
- * @param   vdpMode select what mode the VDP is initialized to.
+ * @param   vdpMode set or change the mode, 0 = Graphics I, 1 = Graphics II, 
+ *          2 = bitmap, 4 = Text.
  * @param   register1 change contents of register one (M1/M2 will be overwritten
  *          by vdpMode). 7 = MEM, 6 = BLK, 5 = IRQ, 1 = SPRITE SIZE, 0 = SPRITE
  *          MAGNIFICATION

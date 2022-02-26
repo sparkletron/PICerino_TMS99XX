@@ -40,6 +40,8 @@ void main(void)
   uint16_t freq = 0;
   uint8_t attn = 0;
   uint8_t shiftRate = 0;
+  
+struct s_tms9928 tms9928;
 
   /* OSCCON SETUP */
   OSCCONbits.IRCF = 0x7;
@@ -67,6 +69,10 @@ void main(void)
   /* wait for chip to be ready */
   __delay_ms(10);
   
+  initTMS9928port(&tms9928, &TRISB, &TRISD, &TRISC, 3, 2, 0, 1, 6);
+  
+  initTMS9928(&tms9928, TXT_MODE, 0x80, 0x04, 0x0B, &LATB, &PORTB, &LATD, &PORTC);
+
   for(;;)
   {
     LATE = g_porteBuffer;
