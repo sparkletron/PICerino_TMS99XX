@@ -1,0 +1,60 @@
+{
+  "Header":
+  {
+    "GenerationSoftware":
+    {
+      "Vendor":      "KiCad",
+      "Application": "Pcbnew",
+      "Version":     "5.1.12-84ad8e8a86~92~ubuntu20.04.1"
+    },
+    "CreationDate":  "2022-03-09T20:20:04-05:00"
+  },
+  "GeneralSpecs":
+  {
+    "ProjectId":
+    {
+      "Name": "PICerino_TMS9928",
+      "GUID": "50494365-7269-46e6-9f5f-544d53393932",
+      "Revision": "rev?"
+    },
+    "Size":
+    {
+      "X": 102.032,
+      "Y": 115.595
+    },
+    "LayerNumber": 2,
+    "BoardThickness":  1.600
+  },
+  "DesignRules":
+  [
+    {
+      "Layers": "Outer",
+      "PadToPad":  0.305,
+      "PadToTrack":  0.305,
+      "TrackToTrack":  0.305,
+      "MinLineWidth":  0.279,
+      "TrackToRegion":  0.305,
+      "RegionToRegion":  0.305
+    }
+  ],
+  "FilesAttributes":
+  [
+    {
+      "Path":  "PICerino_TMS9928-B_Cu.gbr",
+      "FileFunction":  "Copper,L2,Bot",
+      "FilePolarity":  "Positive"
+    },
+    {
+      "Path":  "PICerino_TMS9928-Edge_Cuts.gbr",
+      "FileFunction":  "Profile",
+      "FilePolarity":  "Positive"
+    }
+  ],
+  "MaterialStackup":
+  [
+    {
+      "Type":  "Copper",
+      "Notes":  "Layer B.Cu"
+    }
+  ]
+}
