@@ -88,9 +88,8 @@ void initTMS9928port(struct s_tms9928 *p_tms9928, volatile unsigned char *p_data
   
   p_tms9928->nINT = nINT;
   
-  /**** setup ports to default state ****/
-  
-  *p_tms9928->p_dataTRIS = 0x00;
+  /**** setup control ports to default state ****/
+  *p_tms9928->p_dataTRIS = ~0;
   
   *p_ctrlTRIS &= (unsigned char)~((1 << nCSR) | (1 << nCSW) | (1 << mode) | (1 << nreset));
   
@@ -110,8 +109,6 @@ void initTMS9928(struct s_tms9928 *p_tms9928, uint8_t vdpMode, uint8_t register1
   if(!p_ctrlPortW) return;
   
   if(!p_intPortR) return;
-  
-  //disable interrupt
   
   /**** setup vdp struct ****/
   p_tms9928->vdpMode = vdpMode;
@@ -143,6 +140,23 @@ void initTMS9928(struct s_tms9928 *p_tms9928, uint8_t vdpMode, uint8_t register1
   p_tms9928->p_ctrlPortW = p_ctrlPortW;
   
   p_tms9928->p_intPortR = p_intPortR;
+  
+  /**** set ports to output default values ****/
+  *p_tms9928->p_dataPortW = 0x00;
+  
+  setCtrlBitToZero(p_tms9928, p_tms9928->mode);
+  
+  setCtrlBitToZero(p_tms9928, p_tms9928->nreset);
+  
+  setCtrlBitToOne(p_tms9928, p_tms9928->nCSR);
+  
+  setCtrlBitToOne(p_tms9928, p_tms9928->nCSW);
+  
+  /**** avoid bus contention issues by setting output after nCSR/nCSW are set ****/
+  *p_tms9928->p_dataTRIS = 0x00;
+  
+  /**** reset vdp ****/
+  resetVDP(p_tms9928);
   
   /**** init vdp with defaults ****/
   initVDPmode(p_tms9928);
@@ -268,14 +282,14 @@ void setTMS9928vramTableData(struct s_tms9928 *p_tms9928, uint16_t tableAddr, vo
   
   if(!p_data) return;
   
-  //disable interrupt
+  di();
   
   /**** set starting vram address to write too ****/
   writeVDPvramAddr(p_tms9928, tableAddr + (size * startNum));
   
   writeVDPvram(p_tms9928, (uint8_t *)p_data, size * number);
   
-  //enable interrupt
+  ei();
 }
 
 /*** Set the start of the VRAM address to read or write to. After this is set read or writes will auto increment the address. ***/
@@ -311,7 +325,7 @@ inline uint8_t readVDPstatus(struct s_tms9928 *p_tms9928)
   /**** NULL Check ****/
   if(!p_tms9928) return 0;
  
-  //disable interrupt
+  di();
   
   /**** set mode to 1 for register mode ****/
   setCtrlBitToOne(p_tms9928, p_tms9928->mode);
@@ -334,7 +348,7 @@ inline uint8_t readVDPstatus(struct s_tms9928 *p_tms9928)
   /**** set data bus to output mode ****/
   *p_tms9928->p_dataTRIS = 0x00;
   
-  //enable interrupt
+  ei();
   
   return tempData;
   
@@ -350,7 +364,7 @@ inline void readVDPvram(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size)
  
   if(!p_data) return;
   
-  //disable interrupt
+  di();
   
   /**** no need to set mode, vram mode 0, is the default ****/
   
@@ -372,7 +386,7 @@ inline void readVDPvram(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size)
   /**** set data bus to output mode ****/
   *p_tms9928->p_dataTRIS = 0x00;
 
-  //enable interrupt
+  ei();
 }
 
 /*** write VDP vram ***/
@@ -385,7 +399,7 @@ inline void writeVDPvram(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size)
   
   if(!p_data) return;
   
-  //disable interrupt
+  di();
   
   /**** no need to set mode, vram mode 0, is the default ****/
   
@@ -404,7 +418,7 @@ inline void writeVDPvram(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size)
     setCtrlBitToOne(p_tms9928, p_tms9928->nCSW);
   }
   
-  //enable interrupt
+  ei();
 }
 
 /*** write VDP registers ***/
@@ -413,27 +427,27 @@ inline void writeVDPregister(struct s_tms9928 *p_tms9928, uint8_t regNum, uint8_
   /**** NULL Check ****/
   if(!p_tms9928) return;
   
-  //disable interrupt
+  di();
   
   /**** no need to set data bus, output is default ****/
   
   /**** set mode to one ****/
   setCtrlBitToOne(p_tms9928, p_tms9928->mode);
   
-  /**** set chip select write to low ****/
-  setCtrlBitToZero(p_tms9928, p_tms9928->nCSW);
-  
   /**** output data over bus ****/
   *p_tms9928->p_dataPortW = data;
+  
+  /**** set chip select write to low ****/
+  setCtrlBitToZero(p_tms9928, p_tms9928->nCSW);
   
   /**** set chip select write to high ****/
   setCtrlBitToOne(p_tms9928, p_tms9928->nCSW);
   
-  /**** set chip select write to low ****/
-  setCtrlBitToZero(p_tms9928, p_tms9928->nCSW);
-  
   /**** write msb as 1 and reg num to lower 3 bits ****/
   *p_tms9928->p_dataPortW = (unsigned char)(0x80 | regNum);
+  
+  /**** set chip select write to low ****/
+  setCtrlBitToZero(p_tms9928, p_tms9928->nCSW);
   
   /**** set chip select write to high ****/
   setCtrlBitToOne(p_tms9928, p_tms9928->nCSW);
@@ -441,7 +455,7 @@ inline void writeVDPregister(struct s_tms9928 *p_tms9928, uint8_t regNum, uint8_
   /**** set mode back to 0 ****/
   setCtrlBitToZero(p_tms9928, p_tms9928->mode);
 
-  //enable interrupt
+  ei();
 }
 
 /*** write VDP vram address ***/
@@ -450,7 +464,7 @@ inline void writeVDPvramAddr(struct s_tms9928 *p_tms9928, uint16_t address)
   /**** NULL Check ****/
   if(!p_tms9928) return;
   
-  //disable interrupt
+  di();
   
   /**** no need to set data bus, output is default ****/
   
@@ -478,7 +492,7 @@ inline void writeVDPvramAddr(struct s_tms9928 *p_tms9928, uint16_t address)
   /**** set mode back to 0 ****/
   setCtrlBitToZero(p_tms9928, p_tms9928->mode);
 
-  //enable interrupt
+  ei();
 }
 
 /*** set modes by setting vdpMode ***/
@@ -488,6 +502,7 @@ inline void initVDPmode(struct s_tms9928 *p_tms9928)
   /**** NULL Check ****/
   if(!p_tms9928) return;
   
+  /**** only graphics mode II will set M3 (bit 0) to 1 ****/
   p_tms9928->register0 = (uint8_t)(0x02 & (p_tms9928->vdpMode << 1));
   
   /**** keep previous register 1 settings, only change VDP mode ****/
@@ -535,7 +550,7 @@ inline void resetVDP(struct s_tms9928 *p_tms9928)
   /**** NULL Check ****/
   if(!p_tms9928) return;
   
-  //disable interrupt
+  di();
   
   /**** set reset to 0 to put vdp into reset mode ****/
   setCtrlBitToZero(p_tms9928, p_tms9928->nreset);
@@ -545,6 +560,8 @@ inline void resetVDP(struct s_tms9928 *p_tms9928)
   
   /**** set reset to 1 to take vdp out of reset mode ****/
   setCtrlBitToOne(p_tms9928, p_tms9928->nreset);
+  
+  ei();
 }
 
 /*** set bit to one ***/

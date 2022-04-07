@@ -644,7 +644,7 @@ void initTMS9928port(struct s_tms9928 *p_tms9928, volatile unsigned char *p_data
  * @param   vdpMode set or change the mode, 0 = Graphics I, 1 = Graphics II, 
  *          2 = bitmap, 4 = Text.
  * @param   register1 change contents of register one (M1/M2 will be overwritten
- *          by vdpMode). 7 = MEM, 6 = BLK, 5 = IRQ, 1 = SPRITE SIZE, 0 = SPRITE
+ *          by vdpMode). 7 = MEM, 6 = BLK DISABLE, 5 = IRQ, 1 = SPRITE SIZE, 0 = SPRITE
  *          MAGNIFICATION
  * @param   txtColor set text color to a 4 bit value.
  * @param   backColor set background color to a 4 bit value.
@@ -664,7 +664,7 @@ void initTMS9928(struct s_tms9928 *p_tms9928, uint8_t vdpMode, uint8_t register1
  * @param   vdpMode set or change the mode, 0 = Graphics I, 1 = Graphics II, 
  *          2 = bitmap, 4 = Text.
  * @param   register1 change contents of register one (M1/M2 will be overwritten
- *          by vdpMode). 7 = MEM, 6 = BLK, 5 = IRQ, 1 = SPRITE SIZE, 0 = SPRITE
+ *          by vdpMode). 7 = MEM, 6 = BLK DISABLE, 5 = IRQ, 1 = SPRITE SIZE, 0 = SPRITE
  *          MAGNIFICATION
  ******************************************************************************/
 void setTMS9928mode(struct s_tms9928 *p_tms9928, uint8_t vdpMode, uint8_t register1);
@@ -673,7 +673,7 @@ void setTMS9928mode(struct s_tms9928 *p_tms9928, uint8_t vdpMode, uint8_t regist
  * @brief   Set the TMS9928 to blank the current sprite and pattern planes.
  * 
  * @param   p_tms9928 pointer to struct to contain port data.
- * @param   mode 0 is off, anything else is on.
+ * @param   mode 0 is screen off, anything else is screen on.
  ******************************************************************************/
 void setTMS9928blank(struct s_tms9928 *p_tms9928, uint8_t mode);
 

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * @file      picTEST.c
  * @author    Jay Convertino
- * @date      2021.12.14
+ * @date      2022.03.01
  * @brief     Test PICerino platform
  ******************************************************************************/
 
@@ -40,8 +40,9 @@ void main(void)
   uint16_t freq = 0;
   uint8_t attn = 0;
   uint8_t shiftRate = 0;
+  uint8_t color = 0;
   
-struct s_tms9928 tms9928;
+  struct s_tms9928 tms9928;
 
   /* OSCCON SETUP */
   OSCCONbits.IRCF = 0x7;
@@ -55,9 +56,13 @@ struct s_tms9928 tms9928;
 
   /* disable analog inputs */
   ANSELA = 0;
+  ANSELB = 0;
   ANSELC = 0;
   ANSELD = 0;
   ANSELE = 0;
+  
+  WPUB = 0;
+  IOCB = 0;
 
   /* Port E set all to output */
   TRISE = 0;
@@ -67,14 +72,20 @@ struct s_tms9928 tms9928;
   g_porteBuffer = 1;
 
   /* wait for chip to be ready */
-  __delay_ms(10);
+  __delay_ms(100);
   
   initTMS9928port(&tms9928, &TRISB, &TRISD, &TRISC, 3, 2, 0, 1, 6);
   
-  initTMS9928(&tms9928, TXT_MODE, 0x80, 0x04, 0x0B, &LATB, &PORTB, &LATD, &PORTC);
-
+  initTMS9928(&tms9928, TXT_MODE, 0xC0, 0x04, 0x0B, &LATB, &PORTB, &LATD, &PORTC);
+  
   for(;;)
   {
+    setTMS9928backgroundColor(&tms9928, color);
+    
+    color++;
+    
+    color &= 0x0F;
+    
     LATE = g_porteBuffer;
     g_porteBuffer = (g_porteBuffer == 4 ? 1 : (unsigned)g_porteBuffer << 1);
     __delay_ms(100);
