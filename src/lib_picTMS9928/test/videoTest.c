@@ -13,6 +13,9 @@
 //setup to XTAL freq, for _delay macros
 #define _XTAL_FREQ  48000000
 
+/* 16K of memory */
+#define _MEM_SIZE (1 << 14)
+
 /* configuration bits */
 #pragma config PLLSEL   = PLL3X
 #pragma config CFGPLLEN = ON
@@ -74,9 +77,20 @@ void main(void)
   /* wait for chip to be ready */
   __delay_ms(100);
   
+  /* setup ports in struct for proper i/o */
   initTMS9928port(&tms9928, &TRISB, &TRISD, &TRISC, 3, 2, 0, 1, 6);
   
-  initTMS9928(&tms9928, TXT_MODE, 0xC0, 0x04, 0x0B, &LATB, &PORTB, &LATD, &PORTC);
+  /* setup tms9928 chip and finish setting up struct */
+  initTMS9928(&tms9928, TXT_MODE, 0x80, 0x04, 0x0B, &LATB, &PORTB, &LATD, &PORTC);
+  
+  /* set start address */
+  setTMS9928vramAddr(&tms9928, 0x0000);
+  
+  /* clear all ti vdp memory */
+  clearTMS9928vramData(&tms9928, _MEM_SIZE);
+  
+  /* enable screen */
+  setTMS9928blank(&tms9928, 0);
   
   for(;;)
   {

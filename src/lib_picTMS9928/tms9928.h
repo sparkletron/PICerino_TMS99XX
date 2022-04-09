@@ -673,7 +673,7 @@ void setTMS9928mode(struct s_tms9928 *p_tms9928, uint8_t vdpMode, uint8_t regist
  * @brief   Set the TMS9928 to blank the current sprite and pattern planes.
  * 
  * @param   p_tms9928 pointer to struct to contain port data.
- * @param   mode 0 is screen off, anything else is screen on.
+ * @param   mode 1 is blank on, 0 is blank off
  ******************************************************************************/
 void setTMS9928blank(struct s_tms9928 *p_tms9928, uint8_t mode);
 
@@ -773,5 +773,13 @@ void getTMS9928vramData(struct s_tms9928 *p_tms9928, void *p_data, int size);
  * @return  Status register data byte.
  ******************************************************************************/
 uint8_t getTMS9928status(struct s_tms9928 *p_tms9928);
+
+/***************************************************************************//**
+ * @brief   Clear all data from VRAM from current address to size.
+ * 
+ * @param   p_tms9928 pointer to struct to contain port data.
+ * @param   size number of bytes to clear.
+ ******************************************************************************/
+void clearTMS9928vramData(struct s_tms9928 *p_tms9928, int size);
 
 #endif

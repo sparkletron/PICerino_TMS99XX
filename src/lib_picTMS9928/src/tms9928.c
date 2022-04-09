@@ -181,13 +181,14 @@ void setTMS9928blank(struct s_tms9928 *p_tms9928, uint8_t mode)
   /**** NULL Check ****/
   if(!p_tms9928) return;
   
+  /**** blank is active low, so for mode on (one) set reg bit to 0 ****/
   if(mode)
   {
-    p_tms9928->register1 |= (uint8_t)(1 << BLK_SCRN_BIT);
+    p_tms9928->register1 &= (uint8_t)~(1 << BLK_SCRN_BIT);
   }
   else
   {
-    p_tms9928->register1 &= (uint8_t)~(1 << BLK_SCRN_BIT);
+    p_tms9928->register1 |= (uint8_t)(1 << BLK_SCRN_BIT);
   }
   
   writeVDPregister(p_tms9928, REGISTER_1, p_tms9928->register1);
@@ -316,6 +317,35 @@ uint8_t getTMS9928status(struct s_tms9928 *p_tms9928)
   return readVDPstatus(p_tms9928);
 }
 
+/*** clear data from VRAM. ***/
+void clearTMS9928vramData(struct s_tms9928 *p_tms9928, int size)
+{
+  int index = 0;
+  
+  /**** NULL Check ****/
+  if(!p_tms9928) return;
+  
+  di();
+  
+  /**** no need to set mode, vram mode 0, is the default ****/
+  
+  /**** no need to set data bus, output is default ****/
+  
+  for(index = 0; index < size; index++)
+  {
+    /**** write 0 to clear data ****/
+    *p_tms9928->p_dataPortW = 0x00;
+    
+    /**** set active low chip select write to 0 ****/
+    setCtrlBitToZero(p_tms9928, p_tms9928->nCSW);
+    
+    /**** set active low chip select write to 1 ****/
+    setCtrlBitToOne(p_tms9928, p_tms9928->nCSW);
+  }
+  
+  ei();
+}
+
 /** SEE MY PRIVATES **/
 /*** read VDP status register ***/
 inline uint8_t readVDPstatus(struct s_tms9928 *p_tms9928)
@@ -407,12 +437,11 @@ inline void writeVDPvram(struct s_tms9928 *p_tms9928, uint8_t *p_data, int size)
   
   for(index = 0; index < size; index++)
   {
-    /**** set active low chip select write to 0 ****/
-    setCtrlBitToZero(p_tms9928, p_tms9928->nCSW);
-    
-    //may need to be last, seems like rising edge is when data is latched.
     /**** write data to port from array of data at index ****/
     *p_tms9928->p_dataPortW = p_data[index];
+    
+    /**** set active low chip select write to 0 ****/
+    setCtrlBitToZero(p_tms9928, p_tms9928->nCSW);
     
     /**** set active low chip select write to 1 ****/
     setCtrlBitToOne(p_tms9928, p_tms9928->nCSW);
