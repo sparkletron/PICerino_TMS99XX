@@ -112,9 +112,9 @@ void main(void)
   setTMS99XXvramData(&tms99XX, tms99XX_hello_pattern, sizeof(tms99XX_hello_pattern));
   
   /* write to name tabble */
-  setTMS99XXvramAddr(&tms99XX, NAME_TABLE_ADDR);
+  //setTMS99XXvramAddr(&tms99XX, NAME_TABLE_ADDR);
   
-  setTMS99XXvramData(&tms99XX, tms99XX_hello_name, sizeof(tms99XX_hello_name));
+  //setTMS99XXvramData(&tms99XX, tms99XX_hello_name, sizeof(tms99XX_hello_name));
   
   /* enable screen */
   setTMS99XXblank(&tms99XX, 0);

@@ -2,4 +2,5 @@
   (lib (name OpenDrive-Genesis)(type Legacy)(uri ${KIPRJMOD}/lib/GENESIS_EDGE/OpenDrive-Genesis.lib)(options "")(descr ""))
   (lib (name VINTAGE_PC_VIDEO)(type Legacy)(uri ${KIPRJMOD}/lib/VINTAGE_PC_VIDEO/VINTAGE_PC_VIDEO.lib)(options "")(descr ""))
   (lib (name Picerino)(type Legacy)(uri ${KIPRJMOD}/lib/PICerino/Picerino.lib)(options "")(descr ""))
+  (lib (name ADG453BNZ)(type Legacy)(uri ${KIPRJMOD}/lib/ADG453BNZ/ADG453BNZ.lib)(options "")(descr ""))
 )
