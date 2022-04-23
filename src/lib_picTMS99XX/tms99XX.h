@@ -140,60 +140,60 @@
 
 /** VRAM ADDRESS DEFINES **/
 /**
- * @def NAME_TABEL_ADDR
+ * @def NAME_TABLE_ADDR
  * default address for name table (R2 * 0x400[2^10])
  * 0x3800 address is set when R2 is 0x0E
  */
-#define NAME_TABEL_ADDR 0x3800
+#define NAME_TABLE_ADDR 0x3800
 /**
- * @def NAME_TABEL_ADDR_SCALE
+ * @def NAME_TABLE_ADDR_SCALE
  * value to scale the name table address
  */
-#define NAME_TABEL_ADDR_SCALE 10
+#define NAME_TABLE_ADDR_SCALE 10
 /**
- * @def COLOR_TABEL_ADDR
+ * @def COLOR_TABLE_ADDR
  * default address for color table (R3 * 0x40[2^6])
  * 0x2000 address is set when R3 is 0x80 (GFXII constrains this to FF!!)
  */
-#define COLOR_TABEL_ADDR 0x2000
+#define COLOR_TABLE_ADDR 0x2000
 /**
- * @def COLOR_TABEL_ADDR_SCALE
+ * @def COLOR_TABLE_ADDR_SCALE
  * value to scale the color table address
  */
-#define COLOR_TABEL_ADDR_SCALE 6
+#define COLOR_TABLE_ADDR_SCALE 6
 /**
- * @def PATTERN_TABEL_ADDR
+ * @def PATTERN_TABLE_ADDR
  * default address for pattern table (R4 * 0x800[2^11])
  * 0x0000 address is set when R4 is 0x00 (GFX constrains this to 0x03)
  */
-#define PATTERN_TABEL_ADDR 0x0000
+#define PATTERN_TABLE_ADDR 0x0000
 /**
- * @def PATTERN_TABEL_ADDR_SCALE
+ * @def PATTERN_TABLE_ADDR_SCALE
  * value to scale the pattern table address
  */
-#define PATTERN_TABEL_ADDR_SCALE 11
+#define PATTERN_TABLE_ADDR_SCALE 11
 /**
- * @def SPRITE_ATTRIBUTE_TABEL_ADDR
+ * @def SPRITE_ATTRIBUTE_TABLE_ADDR
  * default address for sprite attribute table (R5 * 0x80[2^7])
  * 0x3B00 address is set when R5 is 0x76
  */
-#define SPRITE_ATTRIBUTE_TABEL_ADDR 0x3B00
+#define SPRITE_ATTRIBUTE_TABLE_ADDR 0x3B00
 /**
- * @def SPRITE_ATTRIBUTE_TABEL_ADDR_SCALE
+ * @def SPRITE_ATTRIBUTE_TABLE_ADDR_SCALE
  * value to scale the sprite attribute address
  */
-#define SPRITE_ATTRIBUTE_TABEL_ADDR_SCALE 7
+#define SPRITE_ATTRIBUTE_TABLE_ADDR_SCALE 7
 /**
- * @def SPRITE_PATTERN_TABEL_ADDR
+ * @def SPRITE_PATTERN_TABLE_ADDR
  * default address for sprite pattern table (R6 * 0x800[2^11])
  * 0x1800 address is set when R6 is 0x03
  */
-#define SPRITE_PATTERN_TABEL_ADDR 0x1800
+#define SPRITE_PATTERN_TABLE_ADDR 0x1800
 /**
- * @def SPRITE_PATTERN_TABEL_ADDR_SCALE
+ * @def SPRITE_PATTERN_TABLE_ADDR_SCALE
  * value to scale the sprite attribute address
  */
-#define SPRITE_PATTERN_TABEL_ADDR_SCALE 11
+#define SPRITE_PATTERN_TABLE_ADDR_SCALE 11
 
 /** COLOR DEFINES **/
 /**

@@ -122,15 +122,15 @@ void initTMS99XX(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t register1
   p_tms99XX->colorReg = (uint8_t)((txtColor << 4) | backColor);
   
   /**** set vdp addresses ****/
-  p_tms99XX->nameTableAddr = NAME_TABEL_ADDR;
+  p_tms99XX->nameTableAddr = NAME_TABLE_ADDR;
   
-  p_tms99XX->colorTableAddr = COLOR_TABEL_ADDR;
+  p_tms99XX->colorTableAddr = COLOR_TABLE_ADDR;
   
-  p_tms99XX->patternTableAddr = PATTERN_TABEL_ADDR;
+  p_tms99XX->patternTableAddr = PATTERN_TABLE_ADDR;
   
-  p_tms99XX->spriteAttributeAddr = SPRITE_ATTRIBUTE_TABEL_ADDR;
+  p_tms99XX->spriteAttributeAddr = SPRITE_ATTRIBUTE_TABLE_ADDR;
   
-  p_tms99XX->spritePatternAddr = SPRITE_PATTERN_TABEL_ADDR;
+  p_tms99XX->spritePatternAddr = SPRITE_PATTERN_TABLE_ADDR;
   
   /**** set VDP ports ****/
   p_tms99XX->p_dataPortW = p_dataPortW;
@@ -544,7 +544,7 @@ inline void initVDPmode(struct s_tms99XX *p_tms99XX)
   writeVDPregister(p_tms99XX, REGISTER_1, p_tms99XX->register1);
   
   /**** setup register 2 for a name table address ****/
-  writeVDPregister(p_tms99XX, REGISTER_2, p_tms99XX->nameTableAddr >> NAME_TABEL_ADDR_SCALE);
+  writeVDPregister(p_tms99XX, REGISTER_2, p_tms99XX->nameTableAddr >> NAME_TABLE_ADDR_SCALE);
   
   if(p_tms99XX->vdpMode == GFXII_MODE)
   {
@@ -557,17 +557,17 @@ inline void initVDPmode(struct s_tms99XX *p_tms99XX)
   else
   {
     /**** setup register 3 for a color table address ****/
-    writeVDPregister(p_tms99XX, REGISTER_3, p_tms99XX->colorTableAddr >> COLOR_TABEL_ADDR_SCALE);
+    writeVDPregister(p_tms99XX, REGISTER_3, p_tms99XX->colorTableAddr >> COLOR_TABLE_ADDR_SCALE);
     
     /**** setup register 4 for pattern table address  ****/
-    writeVDPregister(p_tms99XX, REGISTER_4, p_tms99XX->patternTableAddr >> PATTERN_TABEL_ADDR_SCALE);
+    writeVDPregister(p_tms99XX, REGISTER_4, p_tms99XX->patternTableAddr >> PATTERN_TABLE_ADDR_SCALE);
   }
   
   /**** setup register 5 for sprite attribute table address ****/
-  writeVDPregister(p_tms99XX, REGISTER_5, p_tms99XX->spriteAttributeAddr >> SPRITE_ATTRIBUTE_TABEL_ADDR_SCALE);
+  writeVDPregister(p_tms99XX, REGISTER_5, p_tms99XX->spriteAttributeAddr >> SPRITE_ATTRIBUTE_TABLE_ADDR_SCALE);
   
   /**** setup register 6 for sprite pattern table address ****/
-  writeVDPregister(p_tms99XX, REGISTER_6, p_tms99XX->spritePatternAddr >> SPRITE_PATTERN_TABEL_ADDR_SCALE);
+  writeVDPregister(p_tms99XX, REGISTER_6, p_tms99XX->spritePatternAddr >> SPRITE_PATTERN_TABLE_ADDR_SCALE);
   
   /**** setup register 7 for backdrop color ****/
   writeVDPregister(p_tms99XX, REGISTER_7, p_tms99XX->colorReg);
