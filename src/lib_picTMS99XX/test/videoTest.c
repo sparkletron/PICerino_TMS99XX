@@ -13,9 +13,6 @@
 //setup to XTAL freq, for _delay macros
 #define _XTAL_FREQ  48000000
 
-/* 16K of memory */
-#define _MEM_SIZE (1 << 14)
-
 /* configuration bits */
 #pragma config PLLSEL   = PLL3X
 #pragma config CFGPLLEN = ON
@@ -46,6 +43,25 @@ void main(void)
   uint8_t color = 0;
   
   struct s_tms99XX tms99XX;
+  
+  /* could just an array of bytes, might get a bit messy */
+  struct s_tms99XX_patternTable6x8 tms99XX_hello_pattern[] = 
+  {
+    { .data = {0x88, 0x88, 0x88, 0xF8, 0x88, 0x88, 0x88, 0x00}}, // H
+    { .data = {0xF8, 0x80, 0x80, 0xF0, 0x80, 0x80, 0xF8, 0x00}}, // E
+    { .data = {0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8, 0x00}}, // L
+    { .data = {0x70, 0x88, 0x88, 0x88, 0x88, 0x88, 0x70, 0x00}}  // O
+  };
+  
+  /* could just use an array, struct is for code consistency. */
+  struct s_tms99XX_nameTable tms99XX_hello_name[] =
+  {
+    { .data = 0x00 },
+    { .data = 0x01 },
+    { .data = 0x02 },
+    { .data = 0x02 },
+    { .data = 0x03 }
+  };
 
   /* OSCCON SETUP */
   OSCCONbits.IRCF = 0x7;
@@ -64,6 +80,7 @@ void main(void)
   ANSELD = 0;
   ANSELE = 0;
   
+  /* disable pull ups */
   WPUB = 0;
   IOCB = 0;
 
@@ -87,7 +104,17 @@ void main(void)
   setTMS99XXvramAddr(&tms99XX, 0x0000);
   
   /* clear all ti vdp memory */
-  clearTMS99XXvramData(&tms99XX, _MEM_SIZE);
+  clearTMS99XXvramData(&tms99XX, MEM_SIZE);
+  
+  /* write to pattern table */
+  setTMS99XXvramAddr(&tms99XX, PATTERN_TABEL_ADDR);
+  
+  setTMS99XXvramData(&tms99XX, tms99XX_hello_pattern, sizeof(tms99XX_hello_pattern));
+  
+  /* write to name tabble */
+  setTMS99XXvramAddr(&tms99XX, NAME_TABLE_ADDR);
+  
+  setTMS99XXvramData(&tms99XX, tms99XX_hello_name, sizeof(tms99XX_hello_name));
   
   /* enable screen */
   setTMS99XXblank(&tms99XX, 0);

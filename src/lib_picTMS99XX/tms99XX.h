@@ -277,6 +277,13 @@
  */
 #define TMS_WHITE 0xF
 
+/** MISC DEFINES **/
+/**
+ * @def MEM_SIZE
+ * 16K of memory 
+ */
+#define MEM_SIZE (1 << 14)
+
 /** DATA STRUCTURES **/
 /**
  * @struct s_tms99XX
@@ -490,9 +497,9 @@ struct s_tms99XX_patternTable6x8
 {
   /**
    * @var s_tms99XX_patternTable6x8::data
-   * array of 6 bytes for a 6x8 matrix.
+   * array of 8 bytes for a 6x8 matrix. (2 bits ignored)
    */
-  uint8_t data[6];
+  uint8_t data[8];
 };
 
 /**
