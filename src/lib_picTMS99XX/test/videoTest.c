@@ -37,10 +37,11 @@ uint8_t g_porteBuffer = 0;
 
 void main(void) 
 {
-  uint16_t freq = 0;
-  uint8_t attn = 0;
-  uint8_t shiftRate = 0;
-  uint8_t color = 0;
+  uint8_t   index = 0;
+  uint16_t  freq = 0;
+  uint8_t   attn = 0;
+  uint8_t   shiftRate = 0;
+  uint8_t   color = 0;
   
   uint16_t table_addr = NAME_TABLE_ADDR;
   
@@ -65,6 +66,8 @@ void main(void)
     {0x03}
   };
 
+  uint8_t scrollArray[40] = { 0 };
+  
   /* OSCCON SETUP */
   OSCCONbits.IRCF = 0x7;
   OSCCONbits.OSTS = 0;
@@ -130,19 +133,29 @@ void main(void)
   /* pattern 4 is all 0's, no image */
   setTMS99XXvramConstData(&tms99XX, 0x04, 0x7FA);
   
-  /* enable screen */
-  setTMS99XXblank(&tms99XX, 0);
-  
   for(;;)
   {
-    setTMS99XXbackgroundColor(&tms99XX, color);
-    
-    color++;
-    
-    color &= 0x0F;
+    /* enable screen */
+    setTMS99XXblank(&tms99XX, 0);
     
     LATE = g_porteBuffer;
     g_porteBuffer = (g_porteBuffer == 4 ? 1 : (unsigned)g_porteBuffer << 1);
-    __delay_ms(1000);
+    __delay_ms(50);
+    
+    /* disable screen */
+    setTMS99XXblank(&tms99XX, 1);
+    
+    /* read name table */
+    setTMS99XXvramReadAddr(&tms99XX, NAME_TABLE_ADDR);
+    
+    getTMS99XXvramData(&tms99XX, scrollArray, sizeof(scrollArray));
+    
+    /* shift all data from name table */
+
+    setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR-1);
+    
+    setTMS99XXvramData(&tms99XX, scrollArray, sizeof(scrollArray));
+    
+    setTMS99XXvramData(&tms99XX, &scrollArray[0], 1);
   }
 }
