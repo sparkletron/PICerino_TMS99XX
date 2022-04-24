@@ -40,15 +40,17 @@
 
 #include <tms99XX.h>
 
+#define _XTAL_FREQ  48000000
+
 /** SEE MY PRIVATES **/
 /*** read VDP status register ***/
 inline uint8_t readVDPstatus(struct s_tms99XX *p_tms99XX);
 /*** read VDP vram ***/
-inline void readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size);
+inline void readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen);
 /*** write VDP vram ***/
-inline void writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size);
-/*** write VDP vram address ***/
-inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address);
+inline void writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen);
+/*** set write or read VDP vram address ***/
+inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address, int rnw);
 /*** write VDP registers ***/
 inline void writeVDPregister(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_t data);
 /*** graphics mode I ***/
@@ -275,7 +277,7 @@ void setTMS99XXreg(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_t regData)
 }
 
 /*** Write a struct/union table to vram using address. Alighned to data size. ***/
-void setTMS99XXvramTableData(struct s_tms99XX *p_tms99XX, uint16_t tableAddr, void *p_data, uint8_t startNum, uint8_t number, uint8_t size)
+void setTMS99XXvramTableData(struct s_tms99XX *p_tms99XX, uint16_t tableAddr, void *p_data, int startNum, int number, int size)
 {
   int index = 0;
   /**** NULL Check ****/
@@ -286,29 +288,44 @@ void setTMS99XXvramTableData(struct s_tms99XX *p_tms99XX, uint16_t tableAddr, vo
   di();
   
   /**** set starting vram address to write too ****/
-  writeVDPvramAddr(p_tms99XX, tableAddr + (size * startNum));
+  writeVDPvramAddr(p_tms99XX, tableAddr + (uint16_t)(size * startNum), 0); 
   
-  writeVDPvram(p_tms99XX, (uint8_t *)p_data, size * number);
+  writeVDPvram(p_tms99XX, (uint8_t *)p_data, size * number, size * number);
   
   ei();
 }
 
-/*** Set the start of the VRAM address to read or write to. After this is set read or writes will auto increment the address. ***/
-void setTMS99XXvramAddr(struct s_tms99XX *p_tms99XX, uint16_t vramAddr)
+/*** Set the start of the write VRAM address. After this is set writes will auto increment the address. ***/
+void setTMS99XXvramWriteAddr(struct s_tms99XX *p_tms99XX, uint16_t vramAddr)
 {
-  writeVDPvramAddr(p_tms99XX, vramAddr);
+  writeVDPvramAddr(p_tms99XX, vramAddr, 0);
+}
+
+/*** Set the start of the read VRAM. After this is set read will auto increment the address. ***/
+void setTMS99XXvramReadAddr(struct s_tms99XX *p_tms99XX, uint16_t vramAddr)
+{
+  writeVDPvramAddr(p_tms99XX, vramAddr, 1);
 }
 
 /*** Write array of byte data to VRAM. ***/
 void setTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size)
 {
-  writeVDPvram(p_tms99XX, (uint8_t *)p_data, size);
+  writeVDPvram(p_tms99XX, (uint8_t *)p_data, size, size);
+}
+
+/*** constant value to VRAM. ***/
+void setTMS99XXvramConstData(struct s_tms99XX *p_tms99XX, uint8_t data, int size)
+{
+  /**** NULL Check ****/
+  if(!p_tms99XX) return;
+  
+  writeVDPvram(p_tms99XX, &data, size, 1);
 }
 
 /*** Read array of byte data to VRAM. ***/
 void getTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size)
 {
-  readVDPvram(p_tms99XX, (uint8_t *)p_data, size);
+  readVDPvram(p_tms99XX, (uint8_t *)p_data, size, size);
 }
 
 /*** Read status register of VDP. ***/
@@ -318,32 +335,57 @@ uint8_t getTMS99XXstatus(struct s_tms99XX *p_tms99XX)
 }
 
 /*** clear data from VRAM. ***/
-void clearTMS99XXvramData(struct s_tms99XX *p_tms99XX, int size)
+void clearTMS99XXvramData(struct s_tms99XX *p_tms99XX)
 {
-  int index = 0;
+  uint8_t data = 0x00;
   
   /**** NULL Check ****/
   if(!p_tms99XX) return;
   
+  writeVDPvram(p_tms99XX, &data, MEM_SIZE, 1);
+}
+
+/*** check vram with read write check ***/
+uint8_t checkTMS99XXvram(struct s_tms99XX *p_tms99XX)
+{
+  /**** future improvemtn, crc check of some sort ****/
+  uint16_t index = 0;
+  uint16_t bufIndex = 0;
+  uint8_t  buffer[256] = {0};
+  uint8_t  data = 0x55;
+  
+  /**** NULL Check ****/
+  if(!p_tms99XX) return 0;
+  
+  /**** set start address to write 0x55 to all of the VRAM ****/
+  writeVDPvramAddr(p_tms99XX, 0x0000, 0);
+  
+  /**** Write 0x55 to all of the VRAM ****/
+  writeVDPvram(p_tms99XX, &data, MEM_SIZE, 1);
+  
   di();
   
-  /**** no need to set mode, vram mode 0, is the default ****/
+  /**** reset address to 0 for read ****/
+  writeVDPvramAddr(p_tms99XX, 0x0000, 1);
   
-  /**** no need to set data bus, output is default ****/
-  
-  for(index = 0; index < size; index++)
+  /**** loop in chunks of 256 to read vram ****/
+  for(index = 0; index < MEM_SIZE; index = index + sizeof(buffer))
   {
-    /**** write 0 to clear data ****/
-    *p_tms99XX->p_dataPortW = 0x00;
     
-    /**** set active low chip select write to 0 ****/
-    setCtrlBitToZero(p_tms99XX, p_tms99XX->nCSW);
+    /**** read 256 chunk ****/
+    readVDPvram(p_tms99XX, buffer, sizeof(buffer), sizeof(buffer));
     
-    /**** set active low chip select write to 1 ****/
-    setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSW);
+    /**** check all chunks against original, return 0 if it fails ****/
+    for(bufIndex = 0; bufIndex < sizeof(buffer); bufIndex++)
+    {
+      if(buffer[bufIndex] != data) return 0;
+    }
   }
   
   ei();
+  
+  /**** return 1 on success ****/
+  return 1;
 }
 
 /** SEE MY PRIVATES **/
@@ -385,7 +427,7 @@ inline uint8_t readVDPstatus(struct s_tms99XX *p_tms99XX)
 }
 
 /*** read VDP vram ***/
-inline void readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size)
+inline void readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen)
 {
   int index = 0;
   
@@ -407,7 +449,7 @@ inline void readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size)
     setCtrlBitToZero(p_tms99XX, p_tms99XX->nCSR);
     
     /**** read data from port into array ****/
-    p_data[index] = *p_tms99XX->p_dataPortR;
+    p_data[index % modLen] = *p_tms99XX->p_dataPortR;
     
     /**** set active low chip select read to 1 ****/
     setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSR);
@@ -420,7 +462,7 @@ inline void readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size)
 }
 
 /*** write VDP vram ***/
-inline void writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size)
+inline void writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen)
 {
   int index = 0;
   
@@ -438,7 +480,7 @@ inline void writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size)
   for(index = 0; index < size; index++)
   {
     /**** write data to port from array of data at index ****/
-    *p_tms99XX->p_dataPortW = p_data[index];
+    *p_tms99XX->p_dataPortW = p_data[index % modLen];
     
     /**** set active low chip select write to 0 ****/
     setCtrlBitToZero(p_tms99XX, p_tms99XX->nCSW);
@@ -487,8 +529,8 @@ inline void writeVDPregister(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_
   ei();
 }
 
-/*** write VDP vram address ***/
-inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address)
+/*** set write or read VDP vram address ***/
+inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address, int rnw)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -500,21 +542,21 @@ inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address)
   /**** set mode to one ****/
   setCtrlBitToOne(p_tms99XX, p_tms99XX->mode);
   
+  /**** output bottom 8 bits of 14 bit address ****/
+  *p_tms99XX->p_dataPortW = (unsigned char)(0xFF & address);
+  
   /**** set chip select write to low ****/
   setCtrlBitToZero(p_tms99XX, p_tms99XX->nCSW);
-  
-  /**** output top 8 bits of 14 bit address ****/
-  *p_tms99XX->p_dataPortW = (unsigned char)(0xFF & (address >> 6));
   
   /**** set chip select write to high ****/
   setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSW);
   
+  /**** write bit 7 as 0, 6 as 1, and rest are top 6 bits of address ****/
+  *p_tms99XX->p_dataPortW = (unsigned char)((rnw != 0 ? 0x00 : 0x40) | (0x3F & (address >> 8)));
+  
   /**** set chip select write to low ****/
   setCtrlBitToZero(p_tms99XX, p_tms99XX->nCSW);
-  
-  /**** write bit 7 as 0, 6 as 1, and rest are low 6 bits of address ****/
-  *p_tms99XX->p_dataPortW = (unsigned char)(0x40 | (0x3F & address));
-  
+
   /**** set chip select write to high ****/
   setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSW);
   
@@ -537,10 +579,10 @@ inline void initVDPmode(struct s_tms99XX *p_tms99XX)
   /**** keep previous register 1 settings, only change VDP mode ****/
   p_tms99XX->register1 = (uint8_t)((p_tms99XX->register1 & 0xE3) | ((0x6 & p_tms99XX->vdpMode) << 2));
   
-  /**** setup register 0 for graphics mode I (m0 to 3 are 0) ****/
+  /**** setup register 0 ****/
   writeVDPregister(p_tms99XX, REGISTER_0, p_tms99XX->register0);
   
-  /**** setup regsiter 1 for graphics mode I with 8x8 sprites, irq, blank, and no magnification ****/
+  /**** setup regsiter 1 ****/
   writeVDPregister(p_tms99XX, REGISTER_1, p_tms99XX->register1);
   
   /**** setup register 2 for a name table address ****/
@@ -556,18 +598,25 @@ inline void initVDPmode(struct s_tms99XX *p_tms99XX)
   }
   else
   {
-    /**** setup register 3 for a color table address ****/
-    writeVDPregister(p_tms99XX, REGISTER_3, p_tms99XX->colorTableAddr >> COLOR_TABLE_ADDR_SCALE);
+    if(p_tms99XX->vdpMode != TXT_MODE)
+    {
+      /**** setup register 3 for a color table address ****/
+      writeVDPregister(p_tms99XX, REGISTER_3, p_tms99XX->colorTableAddr >> COLOR_TABLE_ADDR_SCALE);
+    }
     
     /**** setup register 4 for pattern table address  ****/
     writeVDPregister(p_tms99XX, REGISTER_4, p_tms99XX->patternTableAddr >> PATTERN_TABLE_ADDR_SCALE);
   }
   
-  /**** setup register 5 for sprite attribute table address ****/
-  writeVDPregister(p_tms99XX, REGISTER_5, p_tms99XX->spriteAttributeAddr >> SPRITE_ATTRIBUTE_TABLE_ADDR_SCALE);
   
-  /**** setup register 6 for sprite pattern table address ****/
-  writeVDPregister(p_tms99XX, REGISTER_6, p_tms99XX->spritePatternAddr >> SPRITE_PATTERN_TABLE_ADDR_SCALE);
+  if(p_tms99XX->vdpMode != TXT_MODE)
+  {
+    /**** setup register 5 for sprite attribute table address ****/
+    writeVDPregister(p_tms99XX, REGISTER_5, p_tms99XX->spriteAttributeAddr >> SPRITE_ATTRIBUTE_TABLE_ADDR_SCALE);
+    
+    /**** setup register 6 for sprite pattern table address ****/
+    writeVDPregister(p_tms99XX, REGISTER_6, p_tms99XX->spritePatternAddr >> SPRITE_PATTERN_TABLE_ADDR_SCALE);
+  }
   
   /**** setup register 7 for backdrop color ****/
   writeVDPregister(p_tms99XX, REGISTER_7, p_tms99XX->colorReg);

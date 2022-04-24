@@ -42,6 +42,8 @@ void main(void)
   uint8_t shiftRate = 0;
   uint8_t color = 0;
   
+  uint16_t table_addr = NAME_TABLE_ADDR;
+  
   struct s_tms99XX tms99XX;
   
   /* could just an array of bytes, might get a bit messy */
@@ -100,21 +102,31 @@ void main(void)
   /* setup tms9928 chip and finish setting up struct */
   initTMS99XX(&tms99XX, TXT_MODE, 0x80, 0x04, 0x0B, &LATB, &PORTB, &LATD, &PORTC);
   
+  /* check all vram */
+  if(!checkTMS99XXvram(&tms99XX))
+  {
+    LATE = g_porteBuffer;
+    return;
+  }
+  
   /* set start address */
-  setTMS99XXvramAddr(&tms99XX, 0x0000);
+  setTMS99XXvramWriteAddr(&tms99XX, 0x0000);
   
   /* clear all ti vdp memory */
-  clearTMS99XXvramData(&tms99XX, MEM_SIZE);
+  clearTMS99XXvramData(&tms99XX);
   
   /* write to pattern table */
-  setTMS99XXvramAddr(&tms99XX, PATTERN_TABLE_ADDR);
-  
+  setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
+//   
   setTMS99XXvramData(&tms99XX, tms99XX_hello_pattern, sizeof(tms99XX_hello_pattern));
   
   /* write to name tabble */
-  //setTMS99XXvramAddr(&tms99XX, NAME_TABLE_ADDR);
+  setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
   
-  //setTMS99XXvramData(&tms99XX, tms99XX_hello_name, sizeof(tms99XX_hello_name));
+  setTMS99XXvramData(&tms99XX, tms99XX_hello_name, sizeof(tms99XX_hello_name));
+  
+  /* pattern 4 is all 0's, no image */
+  setTMS99XXvramConstData(&tms99XX, 0x04, 0x7FA);
   
   /* enable screen */
   setTMS99XXblank(&tms99XX, 0);
@@ -129,6 +141,6 @@ void main(void)
     
     LATE = g_porteBuffer;
     g_porteBuffer = (g_porteBuffer == 4 ? 1 : (unsigned)g_porteBuffer << 1);
-    __delay_ms(100);
+    __delay_ms(1000);
   }
 }
