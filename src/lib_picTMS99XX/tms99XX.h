@@ -71,10 +71,10 @@
 
 /** register 1 bit defines **/
 /**
- * @def MEM_AMT_BIT
- * amount of memory bit
+ * @def VMEM_AMT_BIT
+ * amount of vram bit
  */
-#define MEM_AMT_BIT 7
+#define VMEM_AMT_BIT 7
 /**
  * @def BLK_SCRN_BIT
  * blank screen bit
@@ -642,7 +642,8 @@ void initTMS99XXport(struct s_tms99XX *p_tms99XX, volatile unsigned char *p_data
 
 /***************************************************************************//**
  * @brief   Initialize TMS99XX struct with ports to use for input output, must match
- * direction registers above. Register 1 can be set to any default values. Memory
+ * direction registers above. Register 1 has VRAM set to 16k, VDP mode set,
+ * the blank enabled(0), and all other bits in there disabled state. Memory
  * addresses will match defines. These could be changed latter and then the
  * setTMS99XXmode run for custom settings on the fly. Better option is to change
  * the defines in this headed to your use case.
@@ -650,17 +651,13 @@ void initTMS99XXport(struct s_tms99XX *p_tms99XX, volatile unsigned char *p_data
  * @param   p_tms99XX pointer to struct to contain port data.
  * @param   vdpMode set or change the mode, 0 = Graphics I, 1 = Graphics II, 
  *          2 = bitmap, 4 = Text.
- * @param   register1 change contents of register one (M1/M2 will be overwritten
- *          by vdpMode). 7 = MEM, 6 = BLK DISABLE, 5 = IRQ, 1 = SPRITE SIZE, 0 = SPRITE
- *          MAGNIFICATION
- * @param   txtColor set text color to a 4 bit value.
  * @param   backColor set background color to a 4 bit value.
  * @param   p_dataPortW pointer to data output port.
  * @param   p_dataPortR pointer to data input port.
  * @param   p_ctrlPortW pointer to control output port.
  * @param   p_intPortR pointer to interrupt input port.
  ******************************************************************************/
-void initTMS99XX(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t register1, uint8_t txtColor, uint8_t backColor, volatile unsigned char *p_dataPortW, volatile unsigned char *p_dataPortR, volatile unsigned char *p_ctrlPortW, volatile unsigned char *p_intPortR);
+void initTMS99XX(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t backColor, volatile unsigned char *p_dataPortW, volatile unsigned char *p_dataPortR, volatile unsigned char *p_ctrlPortW, volatile unsigned char *p_intPortR);
 
 /***************************************************************************//**
  * @brief   Set the TMS99XX mode to one of 4. Text, Graphics I, Graphics II,

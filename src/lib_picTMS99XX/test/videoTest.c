@@ -100,7 +100,9 @@ void main(void)
   initTMS99XXport(&tms99XX, &TRISB, &TRISD, &TRISC, 3, 2, 0, 1, 6);
   
   /* setup tms9928 chip and finish setting up struct */
-  initTMS99XX(&tms99XX, TXT_MODE, 0x80, 0x04, 0x0B, &LATB, &PORTB, &LATD, &PORTC);
+  initTMS99XX(&tms99XX, TXT_MODE, TMS_DARK_GREEN, &LATB, &PORTB, &LATD, &PORTC);
+  
+  setTMS99XXtxtColor(&tms99XX, TMS_WHITE);
   
   /* check all vram */
   if(!checkTMS99XXvram(&tms99XX))

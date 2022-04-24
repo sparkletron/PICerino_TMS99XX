@@ -99,7 +99,7 @@ void initTMS99XXport(struct s_tms99XX *p_tms99XX, volatile unsigned char *p_data
 }
 
 /*** Initialize TMS99XX struct with ports to use for input output, must match direction registers above. ***/
-void initTMS99XX(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t register1, uint8_t txtColor, uint8_t backColor, volatile unsigned char *p_dataPortW, volatile unsigned char *p_dataPortR, volatile unsigned char *p_ctrlPortW, volatile unsigned char *p_intPortR)
+void initTMS99XX(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t backColor, volatile unsigned char *p_dataPortW, volatile unsigned char *p_dataPortR, volatile unsigned char *p_ctrlPortW, volatile unsigned char *p_intPortR)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -118,10 +118,10 @@ void initTMS99XX(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t register1
   /**** clear register 0 ****/
   p_tms99XX->register0 = 0;
   
-  /**** setup register 1 ****/
-  p_tms99XX->register1 = register1;
+  /**** clear register 1, and set to 16k ****/
+  p_tms99XX->register1 = (1 << VMEM_AMT_BIT);
   
-  p_tms99XX->colorReg = (uint8_t)((txtColor << 4) | backColor);
+  p_tms99XX->colorReg = (unsigned char)(backColor & 0x0F);
   
   /**** set vdp addresses ****/
   p_tms99XX->nameTableAddr = NAME_TABLE_ADDR;
@@ -552,7 +552,7 @@ inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address, int 
   setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSW);
   
   /**** write bit 7 as 0, 6 as 1, and rest are top 6 bits of address ****/
-  *p_tms99XX->p_dataPortW = (unsigned char)((rnw != 0 ? 0x00 : 0x40) | (0x3F & (address >> 8)));
+  *p_tms99XX->p_dataPortW = (unsigned char)((rnw != 0 ? 0x00 : 0x40) | (unsigned char)(0x3F & (address >> 8)));
   
   /**** set chip select write to low ****/
   setCtrlBitToZero(p_tms99XX, p_tms99XX->nCSW);
