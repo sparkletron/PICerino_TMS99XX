@@ -114,15 +114,12 @@ void main(void)
     return;
   }
   
-  /* set start address */
-  setTMS99XXvramWriteAddr(&tms99XX, 0x0000);
-  
   /* clear all ti vdp memory */
   clearTMS99XXvramData(&tms99XX);
   
   /* write to pattern table */
   setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
-//   
+
   setTMS99XXvramData(&tms99XX, tms99XX_hello_pattern, sizeof(tms99XX_hello_pattern));
   
   /* write to name tabble */
@@ -133,18 +130,16 @@ void main(void)
   /* pattern 4 is all 0's, no image */
   setTMS99XXvramConstData(&tms99XX, 0x04, 0x7FA);
   
+  /* enable irq */
+  setTMS99XXirq(&tms99XX, 1);
+  
+  /* enable screen */
+  setTMS99XXblank(&tms99XX, 0);
+  
   for(;;)
   {
-    /* enable screen */
-    setTMS99XXblank(&tms99XX, 0);
-    
     LATE = g_porteBuffer;
     g_porteBuffer = (g_porteBuffer == 4 ? 1 : (unsigned)g_porteBuffer << 1);
-    
-    /* disable screen */
-    setTMS99XXblank(&tms99XX, 1);
-    
-    __delay_ms(50);
     
     /* read name table */
     setTMS99XXvramReadAddr(&tms99XX, NAME_TABLE_ADDR);

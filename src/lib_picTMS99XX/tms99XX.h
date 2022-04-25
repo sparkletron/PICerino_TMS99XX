@@ -222,7 +222,7 @@ void getTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size);
 uint8_t getTMS99XXstatus(struct s_tms99XX *p_tms99XX);
 
 /***************************************************************************//**
- * @brief   Clear all data from VRAM from current address to size.
+ * @brief   Clear all data from VRAM from 0x0000 to 0x3FFF.
  * 
  * @param   p_tms99XX pointer to struct to contain port data.
  ******************************************************************************/
