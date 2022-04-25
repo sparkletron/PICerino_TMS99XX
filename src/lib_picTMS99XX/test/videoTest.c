@@ -140,10 +140,11 @@ void main(void)
     
     LATE = g_porteBuffer;
     g_porteBuffer = (g_porteBuffer == 4 ? 1 : (unsigned)g_porteBuffer << 1);
-    __delay_ms(50);
     
     /* disable screen */
     setTMS99XXblank(&tms99XX, 1);
+    
+    __delay_ms(50);
     
     /* read name table */
     setTMS99XXvramReadAddr(&tms99XX, NAME_TABLE_ADDR);
