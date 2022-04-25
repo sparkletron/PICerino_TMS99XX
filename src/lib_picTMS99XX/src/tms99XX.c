@@ -46,9 +46,9 @@
 /*** read VDP status register ***/
 inline uint8_t readVDPstatus(struct s_tms99XX *p_tms99XX);
 /*** read VDP vram ***/
-inline void readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen);
+inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen);
 /*** write VDP vram ***/
-inline void writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen);
+inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen);
 /*** set write or read VDP vram address ***/
 inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address, int rnw);
 /*** write VDP registers ***/
@@ -277,22 +277,14 @@ void setTMS99XXreg(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_t regData)
 }
 
 /*** Write a struct/union table to vram using address. Alighned to data size. ***/
-void setTMS99XXvramTableData(struct s_tms99XX *p_tms99XX, uint16_t tableAddr, void *p_data, int startNum, int number, int size)
+int setTMS99XXvramTableData(struct s_tms99XX *p_tms99XX, uint16_t tableAddr, void *p_data, int startNum, int number, int size)
 {
   int index = 0;
-  /**** NULL Check ****/
-  if(!p_tms99XX) return;
-  
-  if(!p_data) return;
-  
-  di();
   
   /**** set starting vram address to write too ****/
   writeVDPvramAddr(p_tms99XX, tableAddr + (uint16_t)(size * startNum), 0); 
   
-  writeVDPvram(p_tms99XX, (uint8_t *)p_data, size * number, size * number);
-  
-  ei();
+  return writeVDPvram(p_tms99XX, (uint8_t *)p_data, size * number, size * number);
 }
 
 /*** Set the start of the write VRAM address. After this is set writes will auto increment the address. ***/
@@ -308,24 +300,21 @@ void setTMS99XXvramReadAddr(struct s_tms99XX *p_tms99XX, uint16_t vramAddr)
 }
 
 /*** Write array of byte data to VRAM. ***/
-void setTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size)
+int setTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size)
 {
-  writeVDPvram(p_tms99XX, (uint8_t *)p_data, size, size);
+  return writeVDPvram(p_tms99XX, (uint8_t *)p_data, size, size);
 }
 
 /*** constant value to VRAM. ***/
-void setTMS99XXvramConstData(struct s_tms99XX *p_tms99XX, uint8_t data, int size)
+int setTMS99XXvramConstData(struct s_tms99XX *p_tms99XX, uint8_t data, int size)
 {
-  /**** NULL Check ****/
-  if(!p_tms99XX) return;
-  
-  writeVDPvram(p_tms99XX, &data, size, 1);
+  return writeVDPvram(p_tms99XX, &data, size, 1);
 }
 
 /*** Read array of byte data to VRAM. ***/
-void getTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size)
+int getTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size)
 {
-  readVDPvram(p_tms99XX, (uint8_t *)p_data, size, size);
+  return readVDPvram(p_tms99XX, (uint8_t *)p_data, size, size);
 }
 
 /*** Read status register of VDP. ***/
@@ -337,15 +326,17 @@ uint8_t getTMS99XXstatus(struct s_tms99XX *p_tms99XX)
 /*** clear data from VRAM. ***/
 void clearTMS99XXvramData(struct s_tms99XX *p_tms99XX)
 {
-  uint8_t data = 0x00;
-  
-  /**** NULL Check ****/
-  if(!p_tms99XX) return;
+  uint8_t   data = 0x00;
+  uint16_t index = 0;
+  uint16_t amtWrote = 0;
   
   /**** set start address to write 0x00 to all of the VRAM ****/
   writeVDPvramAddr(p_tms99XX, 0x0000, 0);
   
-  writeVDPvram(p_tms99XX, &data, MEM_SIZE, 1);
+  for(index = 0; index < MEM_SIZE; index += amtWrote)
+  {
+    amtWrote = (uint16_t)writeVDPvram(p_tms99XX, &data, MEM_SIZE - index, 1);
+  }
 }
 
 /*** check vram with read write check ***/
@@ -356,17 +347,16 @@ uint8_t checkTMS99XXvram(struct s_tms99XX *p_tms99XX)
   uint16_t bufIndex = 0;
   uint8_t  buffer[256] = {0};
   uint8_t  data = 0x55;
-  
-  /**** NULL Check ****/
-  if(!p_tms99XX) return 0;
+  uint16_t amtRead = 0;
+  uint16_t amtWrote = 0;
   
   /**** set start address to write 0x55 to all of the VRAM ****/
   writeVDPvramAddr(p_tms99XX, 0x0000, 0);
   
-  /**** Write 0x55 to all of the VRAM ****/
-  writeVDPvram(p_tms99XX, &data, MEM_SIZE, 1);
-  
-  di();
+  for(index = 0; index < MEM_SIZE; index += amtWrote)
+  {
+    amtWrote = (uint16_t)writeVDPvram(p_tms99XX, &data, MEM_SIZE - index, 1);
+  }
   
   /**** reset address to 0 for read ****/
   writeVDPvramAddr(p_tms99XX, 0x0000, 1);
@@ -376,16 +366,14 @@ uint8_t checkTMS99XXvram(struct s_tms99XX *p_tms99XX)
   {
     
     /**** read 256 chunk ****/
-    readVDPvram(p_tms99XX, buffer, sizeof(buffer), sizeof(buffer));
+    amtRead = (uint16_t)readVDPvram(p_tms99XX, buffer, sizeof(buffer), sizeof(buffer));
     
     /**** check all chunks against original, return 0 if it fails ****/
-    for(bufIndex = 0; bufIndex < sizeof(buffer); bufIndex++)
+    for(bufIndex = 0; bufIndex < amtRead; bufIndex++)
     {
       if(buffer[bufIndex] != data) return 0;
     }
   }
-  
-  ei();
   
   /**** return 1 on success ****/
   return 1;
@@ -430,14 +418,14 @@ inline uint8_t readVDPstatus(struct s_tms99XX *p_tms99XX)
 }
 
 /*** read VDP vram ***/
-inline void readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen)
+inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen)
 {
   int index = 0;
   
   /**** NULL Check ****/
-  if(!p_tms99XX) return;
+  if(!p_tms99XX) return 0;
  
-  if(!p_data) return;
+  if(!p_data) return 0;
   
   di();
   
@@ -446,44 +434,57 @@ inline void readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, 
   /**** set data bus to input mode ****/
   *p_tms99XX->p_dataTRIS = 0xFF;
   
+  /**** pole for interrupt ****/
+  /**** only pole if IRQ bit set and screen is not blank ****/
+  /**** for 4.3 miliseconds there is no access window waiting, total time is then 2 us ****/
+  /***** approx 1000 bytes can be handled ****/
+  if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01))
+  {
+    /**** nINT is a negative interrupt, while loop will exit on 0 ****/
+    while(((*p_tms99XX->p_intPortR) >> p_tms99XX->nINT) & 0x01);
+    /**** status read clears the interrupt ****/
+    readVDPstatus(p_tms99XX);
+  }
+  
   for(index = 0; index < size; index++)
   {
-    /**** pole for interrupt ****/
-    /**** only pole if IRQ bit set and screen is not blank ****/
-    if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01))
-    {
-      /**** nINT is a negative interrupt, while loop will exit on 0 ****/
-      while(((*p_tms99XX->p_intPortR) >> p_tms99XX->nINT) & 0x01);
-      
-      /**** status read clears the interrupt ****/
-      readVDPstatus(p_tms99XX);
-    }
     
     /**** set active low chip select read to 0 ****/
     setCtrlBitToZero(p_tms99XX, p_tms99XX->nCSR);
+    
+    __delay_us(2);
     
     /**** read data from port into array ****/
     p_data[index % modLen] = *p_tms99XX->p_dataPortR;
     
     /**** set active low chip select read to 1 ****/
     setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSR);
+    
+    if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01) && (index > 1000))
+    {
+      /**** set data bus to output mode ****/
+      *p_tms99XX->p_dataTRIS = 0x00;
+      return index;
+    }
   }
   
   /**** set data bus to output mode ****/
   *p_tms99XX->p_dataTRIS = 0x00;
 
   ei();
+  
+  return index;
 }
 
 /*** write VDP vram ***/
-inline void writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen)
+inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen)
 {
   int index = 0;
   
   /**** NULL Check ****/
-  if(!p_tms99XX) return;
+  if(!p_tms99XX) return 0;
   
-  if(!p_data) return;
+  if(!p_data) return 0;
   
   di();
   
@@ -491,18 +492,20 @@ inline void writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size,
   
   /**** no need to set data bus, output is default ****/
   
+  /**** pole for interrupt ****/
+  /**** only pole if IRQ bit set and screen is not blank ****/
+  /**** for 4.3 miliseconds there is no access window waiting, total time is then 2 us ****/
+  /***** approx 1000 bytes can be handled ****/
+  if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01))
+  {
+    /**** nINT is a negative interrupt, while loop will exit on 0 ****/
+    while(((*p_tms99XX->p_intPortR) >> p_tms99XX->nINT) & 0x01);
+    /**** status read clears the interrupt ****/
+    readVDPstatus(p_tms99XX);
+  }
+  
   for(index = 0; index < size; index++)
   {
-    /**** pole for interrupt ****/
-    /**** only pole if IRQ bit set and screen is not blank ****/
-    if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01))
-    {
-      /**** nINT is a negative interrupt, while loop will exit on 0 ****/
-      while(((*p_tms99XX->p_intPortR) >> p_tms99XX->nINT) & 0x01);
-      
-      /**** status read clears the interrupt ****/
-      readVDPstatus(p_tms99XX);
-    }
     
     /**** write data to port from array of data at index ****/
     *p_tms99XX->p_dataPortW = p_data[index % modLen];
@@ -512,9 +515,18 @@ inline void writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size,
     
     /**** set active low chip select write to 1 ****/
     setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSW);
+    
+    __delay_us(1);
+    
+    if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01) && (index > 1000))
+    {
+      return index;
+    }
   }
   
   ei();
+  
+  return index;
 }
 
 /*** write VDP registers ***/
@@ -563,17 +575,6 @@ inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address, int 
   di();
   
   /**** no need to set data bus, output is default ****/
-  
-  /**** pole for interrupt ****/
-  /**** only pole if IRQ bit set and screen is not blank ****/
-  if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01))
-  {
-    /**** nINT is a negative interrupt, while loop will exit on 0 ****/
-    while(((*p_tms99XX->p_intPortR) >> p_tms99XX->nINT) & 0x01);
-    
-    /**** status read clears the interrupt ****/
-    readVDPstatus(p_tms99XX);
-  }
   
   /**** set mode to one ****/
   setCtrlBitToOne(p_tms99XX, p_tms99XX->mode);
@@ -670,7 +671,7 @@ inline void resetVDP(struct s_tms99XX *p_tms99XX)
   setCtrlBitToZero(p_tms99XX, p_tms99XX->nreset);
   
   /**** delay the needed amount of time per the ti data sheet ****/
-  //__delay_us(3);
+  __delay_us(3);
   
   /**** set reset to 1 to take vdp out of reset mode ****/
   setCtrlBitToOne(p_tms99XX, p_tms99XX->nreset);

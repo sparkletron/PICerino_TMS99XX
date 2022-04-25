@@ -7,11 +7,7 @@
 
 #include <xc.h>
 #include <stdint.h>
-
 #include <tms99XX.h>
-
-//setup to XTAL freq, for _delay macros
-#define _XTAL_FREQ  48000000
 
 /* configuration bits */
 #pragma config PLLSEL   = PLL3X

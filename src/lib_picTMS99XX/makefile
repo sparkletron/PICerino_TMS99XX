@@ -15,7 +15,7 @@ MCPU = 18F45K50
 
 CC = xc8-cc
 AR = xc8-ar
-CFLAGS = -I. -O2 -ansi -xassembler-with-cpp -Wa,-a -mcpu=$(MCPU)
+CFLAGS = -I. -O2 -ansi -xassembler-with-cpp -Wa,-a -mcpu=$(MCPU) -D _XTAL_FREQ=48000000
 LFLAGS = -Wl,--data-init -mno-keep-startup -mno-osccal -mno-resetbits -mno-save-resetbits -mno-download -fno-short-double -fno-short-float  -ginhx032 -I. -l$(OUT) -msummary=-psect,-class,+mem,-hex,-file
 ARFLAGS = -r
 
