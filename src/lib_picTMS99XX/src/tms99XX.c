@@ -436,7 +436,7 @@ inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, i
   
   /**** pole for interrupt ****/
   /**** only pole if IRQ bit set and screen is not blank ****/
-  /**** for 4.3 miliseconds there is no access window waiting, total time is then 2 us ****/
+  /**** for 4.3 miliseconds there is no access window waiting, total time is then 4 us ****/
   /***** approx 1000 bytes can be handled ****/
   if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01))
   {
@@ -460,10 +460,14 @@ inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, i
     /**** set active low chip select read to 1 ****/
     setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSR);
     
+    /**** if irq is enabled, and blank is disabled, and index is 1000 or ever, return index since blank has run out ****/
     if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01) && (index > 1000))
     {
       /**** set data bus to output mode ****/
       *p_tms99XX->p_dataTRIS = 0x00;
+      
+      ei();
+      
       return index;
     }
   }
@@ -494,7 +498,7 @@ inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, 
   
   /**** pole for interrupt ****/
   /**** only pole if IRQ bit set and screen is not blank ****/
-  /**** for 4.3 miliseconds there is no access window waiting, total time is then 2 us ****/
+  /**** for 4.3 miliseconds there is no access window waiting, total time is then 4 us ****/
   /***** approx 1000 bytes can be handled ****/
   if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01))
   {
@@ -518,6 +522,7 @@ inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, 
     
     __delay_us(1);
     
+    /**** if irq is enabled, and blank is disabled, and index is 1000 or ever, return index since blank has run out ****/
     if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01) && (index > 1000))
     {
       return index;
