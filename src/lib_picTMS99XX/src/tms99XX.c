@@ -362,7 +362,7 @@ uint8_t checkTMS99XXvram(struct s_tms99XX *p_tms99XX)
   writeVDPvramAddr(p_tms99XX, 0x0000, 1);
   
   /**** loop in chunks of 256 to read vram ****/
-  for(index = 0; index < MEM_SIZE; index = index + sizeof(buffer))
+  for(index = 0; index < MEM_SIZE; index += amtRead)
   {
     
     /**** read 256 chunk ****/
