@@ -118,19 +118,23 @@ void main(void)
 
   setTMS99XXvramData(&tms99XX, tms99XX_hello_pattern, sizeof(tms99XX_hello_pattern));
   
-  /* write to name tabble */
+  /* pattern 4 is all 0's, no image */
+  setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
+  
+  setTMS99XXvramConstData(&tms99XX, 0x04, 0x7FF);
+  
+  /* write hello world */
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
   
   setTMS99XXvramData(&tms99XX, tms99XX_hello_name, sizeof(tms99XX_hello_name));
   
-  /* pattern 4 is all 0's, no image */
-  setTMS99XXvramConstData(&tms99XX, 0x04, 0x7FA);
-  
   /* enable irq */
-  setTMS99XXirq(&tms99XX, 1);
+  //setTMS99XXirq(&tms99XX, 1);
   
   /* enable screen */
   setTMS99XXblank(&tms99XX, 0);
+  
+  __delay_ms(1000);
   
   for(;;)
   {
@@ -142,12 +146,18 @@ void main(void)
     
     getTMS99XXvramData(&tms99XX, scrollArray, sizeof(scrollArray));
     
+    //shift scrollArray on cpu
+    for(int index = 0; index < sizeof(scrollArray); index++)
+    {
+      scrollArray[index] = scrollArray[(index+1)%(sizeof(scrollArray)-1)];
+    }
+    
+    __delay_ms(50);
+    
     /* shift all data from name table */
-
-    setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR-1);
+    /* write to name tabble */
+    setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
     
     setTMS99XXvramData(&tms99XX, scrollArray, sizeof(scrollArray));
-    
-    setTMS99XXvramData(&tms99XX, &scrollArray[0], 1);
   }
 }

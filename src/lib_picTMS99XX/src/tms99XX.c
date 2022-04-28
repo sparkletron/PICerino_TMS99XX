@@ -452,16 +452,20 @@ inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, i
     /**** set active low chip select read to 0 ****/
     setCtrlBitToZero(p_tms99XX, p_tms99XX->nCSR);
     
-    __delay_us(2);
-    
     /**** read data from port into array ****/
     p_data[index % modLen] = *p_tms99XX->p_dataPortR;
     
     /**** set active low chip select read to 1 ****/
     setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSR);
     
+    /**** use worst case delay if IRQ is not set and we are not blanking the screen ****/
+    if(!((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && !((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01))
+    {
+      __delay_us(8);
+    }
+    
     /**** if irq is enabled, and blank is disabled, and index is 1000 or ever, return index since blank has run out ****/
-    if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01) && (index > 1000))
+    if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01) && (index >= 1000))
     {
       /**** set data bus to output mode ****/
       *p_tms99XX->p_dataTRIS = 0x00;
@@ -520,10 +524,13 @@ inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, 
     /**** set active low chip select write to 1 ****/
     setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSW);
     
-    __delay_us(1);
+    if(!((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && !((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01))
+    {
+      __delay_us(8);
+    }
     
     /**** if irq is enabled, and blank is disabled, and index is 1000 or ever, return index since blank has run out ****/
-    if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01) && (index > 1000))
+    if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01) && (index >= 1000))
     {
       return index;
     }
