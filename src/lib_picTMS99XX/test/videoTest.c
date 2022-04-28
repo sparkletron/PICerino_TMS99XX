@@ -129,7 +129,7 @@ void main(void)
   setTMS99XXvramData(&tms99XX, tms99XX_hello_name, sizeof(tms99XX_hello_name));
   
   /* enable irq */
-  //setTMS99XXirq(&tms99XX, 1);
+  setTMS99XXirq(&tms99XX, 1);
   
   /* enable screen */
   setTMS99XXblank(&tms99XX, 0);

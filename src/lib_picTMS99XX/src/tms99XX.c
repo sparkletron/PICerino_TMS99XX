@@ -442,8 +442,6 @@ inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, i
   {
     /**** nINT is a negative interrupt, while loop will exit on 0 ****/
     while(((*p_tms99XX->p_intPortR) >> p_tms99XX->nINT) & 0x01);
-    /**** status read clears the interrupt ****/
-    readVDPstatus(p_tms99XX);
   }
   
   for(index = 0; index < size; index++)
@@ -467,14 +465,12 @@ inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, i
     /**** if irq is enabled, and blank is disabled, and index is 1000 or ever, return index since blank has run out ****/
     if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01) && (index >= 1000))
     {
-      /**** set data bus to output mode ****/
-      *p_tms99XX->p_dataTRIS = 0x00;
-      
-      ei();
-      
-      return index;
+      break;
     }
   }
+  
+  /**** status read clears the interrupt, also screws up access if done before data transfer  ****/
+  readVDPstatus(p_tms99XX);
   
   /**** set data bus to output mode ****/
   *p_tms99XX->p_dataTRIS = 0x00;
@@ -508,8 +504,6 @@ inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, 
   {
     /**** nINT is a negative interrupt, while loop will exit on 0 ****/
     while(((*p_tms99XX->p_intPortR) >> p_tms99XX->nINT) & 0x01);
-    /**** status read clears the interrupt ****/
-    readVDPstatus(p_tms99XX);
   }
   
   for(index = 0; index < size; index++)
@@ -532,9 +526,12 @@ inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, 
     /**** if irq is enabled, and blank is disabled, and index is 1000 or ever, return index since blank has run out ****/
     if(((p_tms99XX->register1 >> IRQ_BIT) & 0x01) && ((p_tms99XX->register1 >> BLK_SCRN_BIT) & 0x01) && (index >= 1000))
     {
-      return index;
+      break;
     }
   }
+  
+  /**** status read clears the interrupt, also screws up access if done before data transfer ****/
+  readVDPstatus(p_tms99XX);
   
   ei();
   
