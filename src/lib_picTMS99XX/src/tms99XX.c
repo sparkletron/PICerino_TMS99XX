@@ -4,12 +4,12 @@
  * @author  Jay Convertino(electrobs@gmail.com)
  * @date    2022.02.12
  * @details VDP default is:
- *          1 = nCSR
- *          1 = nCSW
- *          0 = MODE
- *          0 = dataTRIS (all data lines are output).
+ *          1  = nCSR
+ *          1  = nCSW
+ *          1  = MODE
+ *          FF = dataTRIS (all data lines are input).
  *          This allows for mode setting and data direction setting to be
- *          skipped.
+ *          skipped for read.
  *          16K is assumed for memory.
  * 
  * @license mit
@@ -146,16 +146,13 @@ void initTMS99XX(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t backColor
   /**** set ports to output default values ****/
   *p_tms99XX->p_dataPortW = 0x00;
   
-  setCtrlBitToZero(p_tms99XX, p_tms99XX->mode);
-  
   setCtrlBitToZero(p_tms99XX, p_tms99XX->nreset);
+  
+  setCtrlBitToOne(p_tms99XX, p_tms99XX->mode);
   
   setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSR);
   
   setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSW);
-  
-  /**** avoid bus contention issues by setting output after nCSR/nCSW are set ****/
-  *p_tms99XX->p_dataTRIS = 0x00;
   
   /**** reset vdp ****/
   resetVDP(p_tms99XX);
@@ -257,6 +254,7 @@ void setTMS99XXtxtColor(struct s_tms99XX *p_tms99XX, uint8_t color)
   if(!p_tms99XX) return;
   
   p_tms99XX->colorReg = (uint8_t)((p_tms99XX->colorReg & 0x0F) | ((color & 0x0F) << 4));
+  
   writeVDPregister(p_tms99XX, REGISTER_7, p_tms99XX->colorReg);
 }
 
@@ -267,6 +265,7 @@ void setTMS99XXbackgroundColor(struct s_tms99XX *p_tms99XX, uint8_t color)
   if(!p_tms99XX) return;
   
   p_tms99XX->colorReg = (uint8_t)((p_tms99XX->colorReg & 0xF0) | (color & 0x0F));
+  
   writeVDPregister(p_tms99XX, REGISTER_7, p_tms99XX->colorReg);
 }
 
@@ -326,7 +325,7 @@ uint8_t getTMS99XXstatus(struct s_tms99XX *p_tms99XX)
 /*** clear data from VRAM. ***/
 void clearTMS99XXvramData(struct s_tms99XX *p_tms99XX)
 {
-  uint8_t   data = 0x00;
+  uint8_t  data = 0x00;
   uint16_t index = 0;
   uint16_t amtWrote = 0;
   
@@ -390,11 +389,9 @@ inline uint8_t readVDPstatus(struct s_tms99XX *p_tms99XX)
  
   di();
   
-  /**** set mode to 1 for register mode ****/
-  setCtrlBitToOne(p_tms99XX, p_tms99XX->mode);
+  /**** no need to set mode to 1 for register mode ****/
   
-  /**** set data bus to input mode ****/
-  *p_tms99XX->p_dataTRIS = 0xFF;
+  /**** no need to set data bus to input mode ****/
   
   /**** set active low chip select read to 0 ****/
   setCtrlBitToZero(p_tms99XX, p_tms99XX->nCSR);
@@ -404,12 +401,6 @@ inline uint8_t readVDPstatus(struct s_tms99XX *p_tms99XX)
   
   /**** set active low chip select read back to 1 ****/
   setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSR);
-  
-  /**** set mode back to 0, normal vram read/write ****/
-  setCtrlBitToZero(p_tms99XX, p_tms99XX->mode);
-  
-  /**** set data bus to output mode ****/
-  *p_tms99XX->p_dataTRIS = 0x00;
   
   ei();
   
@@ -429,10 +420,10 @@ inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, i
   
   di();
   
-  /**** no need to set mode, vram mode 0, is the default ****/
+  /**** set mode to 0 ****/
+  setCtrlBitToZero(p_tms99XX, p_tms99XX->mode);
   
-  /**** set data bus to input mode ****/
-  *p_tms99XX->p_dataTRIS = 0xFF;
+  /**** no need to set data bus to input mode ****/
   
   /**** pole for interrupt ****/
   /**** only pole if IRQ bit set and screen is not blank ****/
@@ -471,10 +462,10 @@ inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, i
   
   /**** status read clears the interrupt, also screws up access if done before data transfer  ****/
   readVDPstatus(p_tms99XX);
-  
-  /**** set data bus to output mode ****/
-  *p_tms99XX->p_dataTRIS = 0x00;
 
+  /**** set mode to 1 ****/
+  setCtrlBitToOne(p_tms99XX, p_tms99XX->mode);
+  
   ei();
   
   return index;
@@ -492,9 +483,11 @@ inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, 
   
   di();
   
-  /**** no need to set mode, vram mode 0, is the default ****/
+  /**** set mode to 0 ****/
+  setCtrlBitToZero(p_tms99XX, p_tms99XX->mode);
   
-  /**** no need to set data bus, output is default ****/
+  /**** set data bus to output ****/
+  *p_tms99XX->p_dataTRIS = 0x00;
   
   /**** pole for interrupt ****/
   /**** only pole if IRQ bit set and screen is not blank ****/
@@ -530,8 +523,14 @@ inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, 
     }
   }
   
+  /**** set data bus to input ****/
+  *p_tms99XX->p_dataTRIS = 0xFF;
+  
   /**** status read clears the interrupt, also screws up access if done before data transfer ****/
   readVDPstatus(p_tms99XX);
+    
+  /**** set mode to 1 ****/
+  setCtrlBitToOne(p_tms99XX, p_tms99XX->mode);
   
   ei();
   
@@ -546,10 +545,10 @@ inline void writeVDPregister(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_
   
   di();
   
-  /**** no need to set data bus, output is default ****/
+  /**** set data bus to output ****/
+  *p_tms99XX->p_dataTRIS = 0x00;
   
-  /**** set mode to one ****/
-  setCtrlBitToOne(p_tms99XX, p_tms99XX->mode);
+  /**** no need to set mode to 1 for register mode ****/
   
   /**** output data over bus ****/
   *p_tms99XX->p_dataPortW = data;
@@ -569,8 +568,8 @@ inline void writeVDPregister(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_
   /**** set chip select write to high ****/
   setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSW);
   
-  /**** set mode back to 0 ****/
-  setCtrlBitToZero(p_tms99XX, p_tms99XX->mode);
+  /**** set data bus to input ****/
+  *p_tms99XX->p_dataTRIS = 0xFF;
 
   ei();
 }
@@ -583,10 +582,10 @@ inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address, int 
   
   di();
   
-  /**** no need to set data bus, output is default ****/
+  /**** no need to set mode to 1 for register mode ****/
   
-  /**** set mode to one ****/
-  setCtrlBitToOne(p_tms99XX, p_tms99XX->mode);
+  /**** set data bus to output ****/
+  *p_tms99XX->p_dataTRIS = 0x00;
   
   /**** output bottom 8 bits of 14 bit address ****/
   *p_tms99XX->p_dataPortW = (unsigned char)(0xFF & address);
@@ -605,10 +604,10 @@ inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address, int 
 
   /**** set chip select write to high ****/
   setCtrlBitToOne(p_tms99XX, p_tms99XX->nCSW);
-  
-  /**** set mode back to 0 ****/
-  setCtrlBitToZero(p_tms99XX, p_tms99XX->mode);
 
+  /**** set data bus to input ****/
+  *p_tms99XX->p_dataTRIS = 0xFF;
+  
   ei();
 }
 
