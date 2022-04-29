@@ -460,11 +460,11 @@ inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, i
     }
   }
   
-  /**** status read clears the interrupt, also screws up access if done before data transfer  ****/
-  readVDPstatus(p_tms99XX);
-
   /**** set mode to 1 ****/
   setCtrlBitToOne(p_tms99XX, p_tms99XX->mode);
+  
+  /**** status read clears the interrupt, also screws up access if done before data transfer  ****/
+  readVDPstatus(p_tms99XX);
   
   ei();
   
@@ -526,11 +526,11 @@ inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, 
   /**** set data bus to input ****/
   *p_tms99XX->p_dataTRIS = 0xFF;
   
-  /**** status read clears the interrupt, also screws up access if done before data transfer ****/
-  readVDPstatus(p_tms99XX);
-    
   /**** set mode to 1 ****/
   setCtrlBitToOne(p_tms99XX, p_tms99XX->mode);
+  
+  /**** status read clears the interrupt, also screws up access if done before data transfer ****/
+  readVDPstatus(p_tms99XX);
   
   ei();
   
