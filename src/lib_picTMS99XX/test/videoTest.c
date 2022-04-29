@@ -38,6 +38,7 @@ void main(void)
   uint8_t   attn = 0;
   uint8_t   shiftRate = 0;
   uint8_t   color = 0;
+  uint8_t   temp = 0;
   
   uint16_t table_addr = NAME_TABLE_ADDR;
   
@@ -141,23 +142,29 @@ void main(void)
     LATE = g_porteBuffer;
     g_porteBuffer = (g_porteBuffer == 4 ? 1 : (unsigned)g_porteBuffer << 1);
     
+    __delay_ms(50);
+    
     /* read name table */
     setTMS99XXvramReadAddr(&tms99XX, NAME_TABLE_ADDR);
     
     getTMS99XXvramData(&tms99XX, scrollArray, sizeof(scrollArray));
     
-    //shift scrollArray on cpu
-    for(int index = 0; index < sizeof(scrollArray); index++)
-    {
-      scrollArray[index] = scrollArray[(index+1)%(sizeof(scrollArray)-1)];
-    }
-    
-    __delay_ms(50);
+//     temp = scrollArray[0];
+//     
+//     //shift scrollArray on cpu
+//     for(int index = 0; index < sizeof(scrollArray)-1; index++)
+//     {
+//       scrollArray[index] = scrollArray[index+1];
+//     }
+//     
+//     scrollArray[sizeof(scrollArray)-1] = temp;
     
     /* shift all data from name table */
     /* write to name tabble */
-    setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
+    setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR-1);
     
     setTMS99XXvramData(&tms99XX, scrollArray, sizeof(scrollArray));
+    
+    setTMS99XXvramData(&tms99XX, &scrollArray[0], 1);
   }
 }
