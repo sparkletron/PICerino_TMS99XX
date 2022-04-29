@@ -130,6 +130,8 @@ void main(void)
   setTMS99XXvramData(&tms99XX, tms99XX_hello_name, sizeof(tms99XX_hello_name));
   
   /* enable irq */
+  /* when irq is enabled, polling will be used */
+  /* disable to test 8 us delay method, no polling */
   setTMS99XXirq(&tms99XX, 1);
   
   /* enable screen */
@@ -148,16 +150,6 @@ void main(void)
     setTMS99XXvramReadAddr(&tms99XX, NAME_TABLE_ADDR);
     
     getTMS99XXvramData(&tms99XX, scrollArray, sizeof(scrollArray));
-    
-//     temp = scrollArray[0];
-//     
-//     //shift scrollArray on cpu
-//     for(int index = 0; index < sizeof(scrollArray)-1; index++)
-//     {
-//       scrollArray[index] = scrollArray[index+1];
-//     }
-//     
-//     scrollArray[sizeof(scrollArray)-1] = temp;
     
     /* shift all data from name table */
     /* write to name tabble */
