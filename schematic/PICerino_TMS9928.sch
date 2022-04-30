@@ -2866,4 +2866,27 @@ Wire Bus Line
 	5000 3550 5000 4250
 Wire Bus Line
 	3500 3550 3500 4250
+$Comp
+L Connector_Generic:Conn_01x02 J13
+U 1 1 627060A9
+P 6835 9360
+F 0 "J13" H 6800 9045 50  0000 L CNN
+F 1 "Conn_01x02" H 6475 9120 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 6835 9360 50  0001 C CNN
+F 3 "~" H 6835 9360 50  0001 C CNN
+	1    6835 9360
+	1    0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x02 J14
+U 1 1 62708C59
+P 6835 9560
+F 0 "J14" H 6805 9730 50  0000 L CNN
+F 1 "Conn_01x02" H 6545 9655 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 6835 9560 50  0001 C CNN
+F 3 "~" H 6835 9560 50  0001 C CNN
+	1    6835 9560
+	1    0    0    1   
+$EndComp
+Connection ~ 6635 9460
 $EndSCHEMATC
