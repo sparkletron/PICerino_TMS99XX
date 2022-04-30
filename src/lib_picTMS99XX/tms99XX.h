@@ -4,18 +4,18 @@
  * @author  Jay Convertino(electrobs@gmail.com)
  * @date    2022.02.12
  * @details VDP default is:
- *          1 = nCSR
- *          1 = nCSW
- *          0 = MODE
- *          0 = dataTRIS (all data lines are output).
+ *          1  = nCSR
+ *          1  = nCSW
+ *          1  = MODE
+ *          FF = dataTRIS (all data lines are input).
  *          This allows for mode setting and data direction setting to be
- *          skipped.
+ *          skipped for read.
  *          16K is assumed for memory.
  * 
  * @version 0.0.1
  * 
  * @TODO
- *  - EVERYTHING
+ *  - Cleanup, graphics testing, and hard coded values altered to be less hard.
  * 
  * @license mit
  * 
@@ -45,6 +45,7 @@
 
 #include <xc.h>
 #include <stdint.h>
+/** the below includes define other tms stuffs see them for more info **/
 #include <tms99XXdefines.h>
 #include <tms99XXdatatypes.h>
 

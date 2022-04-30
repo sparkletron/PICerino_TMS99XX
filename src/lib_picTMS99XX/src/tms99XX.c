@@ -1,6 +1,6 @@
 /*******************************************************************************
  * @file    tms99XX.c
- * @brief   Library for TI video display processor.
+ * @brief   Library for TI TMS9918/28/29 video display processor.
  * @author  Jay Convertino(electrobs@gmail.com)
  * @date    2022.02.12
  * @details VDP default is:
@@ -39,8 +39,6 @@
 #include <stdint.h>
 
 #include <tms99XX.h>
-
-#define _XTAL_FREQ  48000000
 
 /** SEE MY PRIVATES **/
 /*** read VDP status register ***/
