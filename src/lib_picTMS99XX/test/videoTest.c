@@ -8,6 +8,7 @@
 #include <xc.h>
 #include <stdint.h>
 #include <tms99XX.h>
+#include <tms99XXascii.h>
 
 /* configuration bits */
 #pragma config PLLSEL   = PLL3X
