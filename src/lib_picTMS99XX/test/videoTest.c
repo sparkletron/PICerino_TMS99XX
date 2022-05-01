@@ -34,6 +34,7 @@ uint8_t g_porteBuffer = 0;
 
 void main(void) 
 {
+  /* happy fun time variables */
   uint8_t   index = 0;
   uint16_t  freq = 0;
   uint8_t   attn = 0;
@@ -41,27 +42,23 @@ void main(void)
   uint8_t   color = 0;
   uint8_t   temp = 0;
   
-  uint16_t table_addr = NAME_TABLE_ADDR;
-  
+  /* contains ti chip object */
   struct s_tms99XX tms99XX;
   
-  /* could just use an array, struct is for code consistency. */
-  struct s_tms99XX_nameTable tms99XX_hello_name[] =
-  {
-    {0x00},
-    {0x01},
-    {0x02},
-    {0x02},
-    {0x03}
-  };
+  char helloWorld[] = "Hello World!!!";
   
-  uint8_t nameTable[sizeof(c_tms99XX_ascii)/8] = {0};
+  char tag[] = "2022 Jay Convertino";
+  
+  /* create struct to store ascii name table in order */
+  uint8_t nameTable[(sizeof(c_tms99XX_ascii) - (32 * 8))/8] = {0};
 
+  /* buffer array to scoll a text line */
   uint8_t scrollArray[40] = {0};
   
-  for(index = 0; index < sizeof(nameTable); index++)
+  /* create nametable to display all ascii characters */
+  for(index = 32; index < sizeof(nameTable)+32; index++)
   {
-    nameTable[index] = index;
+    nameTable[index-32] = index;
   }
   
   /* OSCCON SETUP */
@@ -103,6 +100,8 @@ void main(void)
   
   setTMS99XXtxtColor(&tms99XX, TMS_WHITE);
   
+  /* SYSTEM TESTS */
+  
   /* check all vram */
   if(!checkTMS99XXvram(&tms99XX))
   {
@@ -113,20 +112,33 @@ void main(void)
   /* clear all ti vdp memory */
   clearTMS99XXvramData(&tms99XX);
   
+  /* MODE TESTS */
+  
+  /* 1ST: TEXT MODE */
   /* write to pattern table */
   setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
 
   setTMS99XXvramData(&tms99XX, c_tms99XX_ascii, sizeof(c_tms99XX_ascii));
   
-  /* pattern 4 is all 0's, no image */
+  /* first ascii letter is space in this table, no image */
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
   
-  setTMS99XXvramConstData(&tms99XX, 0x04, 0x7FF);
+  setTMS99XXvramConstData(&tms99XX, 0, 0x7FF);
   
-  /* write hello world */
+  /* write all ascii text */
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
   
   setTMS99XXvramData(&tms99XX, nameTable, sizeof(nameTable));
+  
+  /* write hello world on line 12 */
+  setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR + (40 * 11));
+  
+  setTMS99XXvramData(&tms99XX, helloWorld, sizeof(helloWorld));
+  
+  /* write 2022 Jay Convertino on last line (24 (23, offset 0)) */
+  setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR + (40 * 23));
+  
+  setTMS99XXvramData(&tms99XX, tag, sizeof(tag)); 
   
   /* enable irq */
   /* when irq is enabled, polling will be used */
@@ -146,15 +158,15 @@ void main(void)
     __delay_ms(50);
     
     /* read name table */
-    setTMS99XXvramReadAddr(&tms99XX, NAME_TABLE_ADDR);
+    setTMS99XXvramReadAddr(&tms99XX, NAME_TABLE_ADDR + (40 * 11));
     
     getTMS99XXvramData(&tms99XX, scrollArray, sizeof(scrollArray));
     
     /* shift all data from name table */
     /* write to name tabble */
-    setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR-1);
+    setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR + (40 * 11));
     
-    setTMS99XXvramData(&tms99XX, scrollArray, sizeof(scrollArray));
+    setTMS99XXvramData(&tms99XX, &scrollArray[1], sizeof(scrollArray)-1);
     
     setTMS99XXvramData(&tms99XX, &scrollArray[0], 1);
   }
