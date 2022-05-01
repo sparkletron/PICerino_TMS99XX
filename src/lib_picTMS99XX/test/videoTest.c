@@ -45,15 +45,6 @@ void main(void)
   
   struct s_tms99XX tms99XX;
   
-  /* could just an array of bytes, might get a bit messy */
-  struct s_tms99XX_patternTable6x8 tms99XX_hello_pattern[] = 
-  {
-    {{0x88, 0x88, 0x88, 0xF8, 0x88, 0x88, 0x88, 0x00}}, // H
-    {{0xF8, 0x80, 0x80, 0xF0, 0x80, 0x80, 0xF8, 0x00}}, // E
-    {{0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8, 0x00}}, // L
-    {{0x70, 0x88, 0x88, 0x88, 0x88, 0x88, 0x70, 0x00}}  // O
-  };
-  
   /* could just use an array, struct is for code consistency. */
   struct s_tms99XX_nameTable tms99XX_hello_name[] =
   {
@@ -63,8 +54,15 @@ void main(void)
     {0x02},
     {0x03}
   };
+  
+  uint8_t nameTable[sizeof(c_tms99XX_ascii)/8] = {0};
 
-  uint8_t scrollArray[40] = { 0 };
+  uint8_t scrollArray[40] = {0};
+  
+  for(index = 0; index < sizeof(nameTable); index++)
+  {
+    nameTable[index] = index;
+  }
   
   /* OSCCON SETUP */
   OSCCONbits.IRCF = 0x7;
@@ -118,7 +116,7 @@ void main(void)
   /* write to pattern table */
   setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
 
-  setTMS99XXvramData(&tms99XX, tms99XX_hello_pattern, sizeof(tms99XX_hello_pattern));
+  setTMS99XXvramData(&tms99XX, c_tms99XX_ascii, sizeof(c_tms99XX_ascii));
   
   /* pattern 4 is all 0's, no image */
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
@@ -128,7 +126,7 @@ void main(void)
   /* write hello world */
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
   
-  setTMS99XXvramData(&tms99XX, tms99XX_hello_name, sizeof(tms99XX_hello_name));
+  setTMS99XXvramData(&tms99XX, nameTable, sizeof(nameTable));
   
   /* enable irq */
   /* when irq is enabled, polling will be used */
