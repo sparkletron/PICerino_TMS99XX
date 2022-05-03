@@ -64,7 +64,7 @@
  * @param   nreset is the pin number(bit) nreset is connected to on the control port.
  * @param   nINT is the pin number(bit) interrupt output is connected to on the control port.
  ******************************************************************************/
-void initTMS99XXport(struct s_tms99XX *p_tms99XX, volatile unsigned char *p_dataTRIS, volatile unsigned char *p_ctrlTRIS, volatile unsigned char *p_intTRIS, uint8_t nCSR, uint8_t nCSW, uint8_t mode, uint8_t nreset, uint8_t nINT);
+void initTMS99XXport(struct s_tms99XX * const p_tms99XX, volatile unsigned char *p_dataTRIS, volatile unsigned char *p_ctrlTRIS, volatile unsigned char *p_intTRIS, uint8_t nCSR, uint8_t nCSW, uint8_t mode, uint8_t nreset, uint8_t nINT);
 
 /***************************************************************************//**
  * @brief   Initialize TMS99XX struct with ports to use for input output, must match
@@ -83,21 +83,17 @@ void initTMS99XXport(struct s_tms99XX *p_tms99XX, volatile unsigned char *p_data
  * @param   p_ctrlPortW pointer to control output port.
  * @param   p_intPortR pointer to interrupt input port.
  ******************************************************************************/
-void initTMS99XX(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t backColor, volatile unsigned char *p_dataPortW, volatile unsigned char *p_dataPortR, volatile unsigned char *p_ctrlPortW, volatile unsigned char *p_intPortR);
+void initTMS99XX(struct s_tms99XX * const p_tms99XX, uint8_t vdpMode, uint8_t backColor, volatile unsigned char *p_dataPortW, volatile unsigned char *p_dataPortR, volatile unsigned char *p_ctrlPortW, volatile unsigned char *p_intPortR);
 
 /***************************************************************************//**
  * @brief   Set the TMS99XX mode to one of 4. Text, Graphics I, Graphics II,
- *          and bitmap. This will also reset all addresses, and will set register
- *          1 to new specified values.
+ *          and bitmap. This will also reset all addresses for the needed mode.
  * 
  * @param   p_tms99XX pointer to struct to contain port data.
  * @param   vdpMode set or change the mode, 0 = Graphics I, 1 = Graphics II, 
  *          2 = bitmap, 4 = Text.
- * @param   register1 change contents of register one (M1/M2 will be overwritten
- *          by vdpMode). 7 = MEM, 6 = BLK DISABLE, 5 = IRQ, 1 = SPRITE SIZE, 0 = SPRITE
- *          MAGNIFICATION
  ******************************************************************************/
-void setTMS99XXmode(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t register1);
+void setTMS99XXmode(struct s_tms99XX * const p_tms99XX, uint8_t vdpMode);
 
 /***************************************************************************//**
  * @brief   Set the TMS99XX to blank the current sprite and pattern planes.
@@ -105,7 +101,7 @@ void setTMS99XXmode(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t regist
  * @param   p_tms99XX pointer to struct to contain port data.
  * @param   mode 1 is blank on, 0 is blank off
  ******************************************************************************/
-void setTMS99XXblank(struct s_tms99XX *p_tms99XX, uint8_t mode);
+void setTMS99XXblank(struct s_tms99XX * const p_tms99XX, uint8_t mode);
 
 /***************************************************************************//**
  * @brief   Set the TMS99XX to irq to enabled or disabled.
@@ -113,7 +109,7 @@ void setTMS99XXblank(struct s_tms99XX *p_tms99XX, uint8_t mode);
  * @param   p_tms99XX pointer to struct to contain port data.
  * @param   mode 0 is off, anything else is on.
  ******************************************************************************/
-void setTMS99XXirq(struct s_tms99XX *p_tms99XX, uint8_t mode);
+void setTMS99XXirq(struct s_tms99XX * const p_tms99XX, uint8_t mode);
 
 /***************************************************************************//**
  * @brief   Set the TMS99XX to sprite size to 8x8 or 16x16.
@@ -121,7 +117,7 @@ void setTMS99XXirq(struct s_tms99XX *p_tms99XX, uint8_t mode);
  * @param   p_tms99XX pointer to struct to contain port data.
  * @param   mode 0 is 8x8, anything else is 16x16.
  ******************************************************************************/
-void setTMS99XXspriteSize(struct s_tms99XX *p_tms99XX, uint8_t mode);
+void setTMS99XXspriteSize(struct s_tms99XX * const p_tms99XX, uint8_t mode);
 
 /***************************************************************************//**
  * @brief   Set the TMS99XX to sprite magnify to on or off (double set size).
@@ -129,7 +125,7 @@ void setTMS99XXspriteSize(struct s_tms99XX *p_tms99XX, uint8_t mode);
  * @param   p_tms99XX pointer to struct to contain port data.
  * @param   mode 0 is off, anything else is double sprite size.
  ******************************************************************************/
-void setTMS99XXspriteMagnify(struct s_tms99XX *p_tms99XX, uint8_t mode);
+void setTMS99XXspriteMagnify(struct s_tms99XX * const p_tms99XX, uint8_t mode);
 
 /***************************************************************************//**
  * @brief   Set the TMS99XX text color in text mode.
@@ -137,7 +133,7 @@ void setTMS99XXspriteMagnify(struct s_tms99XX *p_tms99XX, uint8_t mode);
  * @param   p_tms99XX pointer to struct to contain port data.
  * @param   color 4 bit color value.
  ******************************************************************************/
-void setTMS99XXtxtColor(struct s_tms99XX *p_tms99XX, uint8_t color);
+void setTMS99XXtxtColor(struct s_tms99XX * const p_tms99XX, uint8_t color);
 
 /***************************************************************************//**
  * @brief   Set the TMS99XX background color.
@@ -145,7 +141,7 @@ void setTMS99XXtxtColor(struct s_tms99XX *p_tms99XX, uint8_t color);
  * @param   p_tms99XX pointer to struct to contain port data.
  * @param   color 4 bit color value.
  ******************************************************************************/
-void setTMS99XXbackgroundColor(struct s_tms99XX *p_tms99XX, uint8_t color);
+void setTMS99XXbackgroundColor(struct s_tms99XX * const p_tms99XX, uint8_t color);
 
 /***************************************************************************//**
  * @brief   Set a register with a 8 bit value.
@@ -154,7 +150,7 @@ void setTMS99XXbackgroundColor(struct s_tms99XX *p_tms99XX, uint8_t color);
  * @param   regNum which register to write to. 0 to 7.
  * @param   regData data to write to register.
  ******************************************************************************/
-void setTMS99XXreg(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_t regData);
+void setTMS99XXreg(struct s_tms99XX * const p_tms99XX, uint8_t regNum, uint8_t regData);
 
 /***************************************************************************//**
  * @brief   Write a pattern or patterns into vram pattern table. Alighned to 
@@ -168,7 +164,7 @@ void setTMS99XXreg(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_t regData)
  * @param   size of the data members in the table (all tables of member data, sizeof(data))
  * @return  number of bytes actually wrote
  ******************************************************************************/
-int setTMS99XXvramTableData(struct s_tms99XX *p_tms99XX, uint16_t tableAddr, void *p_data, int startNum, int number, int size);
+int setTMS99XXvramTableData(struct s_tms99XX * const p_tms99XX, uint16_t tableAddr, void const * const p_data, int startNum, int number, int size);
 
 /***************************************************************************//**
  * @brief   Set the start of the VRAM address to write to. After this
@@ -177,7 +173,7 @@ int setTMS99XXvramTableData(struct s_tms99XX *p_tms99XX, uint16_t tableAddr, voi
  * @param   p_tms99XX pointer to struct to contain port data.
  * @param   vramAddr 14 bit address into the vram.   
  ******************************************************************************/
-void setTMS99XXvramWriteAddr(struct s_tms99XX *p_tms99XX, uint16_t vramAddr);
+void setTMS99XXvramWriteAddr(struct s_tms99XX * const p_tms99XX, uint16_t vramAddr);
 
 /***************************************************************************//**
  * @brief   Set the start of the VRAM address to read to. After this
@@ -186,7 +182,7 @@ void setTMS99XXvramWriteAddr(struct s_tms99XX *p_tms99XX, uint16_t vramAddr);
  * @param   p_tms99XX pointer to struct to contain port data.
  * @param   vramAddr 14 bit address into the vram.   
  ******************************************************************************/
-void setTMS99XXvramReadAddr(struct s_tms99XX *p_tms99XX, uint16_t vramAddr);
+void setTMS99XXvramReadAddr(struct s_tms99XX * const p_tms99XX, uint16_t vramAddr);
 
 /***************************************************************************//**
  * @brief   Write array of byte data to VRAM.
@@ -196,7 +192,7 @@ void setTMS99XXvramReadAddr(struct s_tms99XX *p_tms99XX, uint16_t vramAddr);
  * @param   size number of bytes to write to VRAM.
  * @return  actual number of bytes wrote.
  ******************************************************************************/
-int setTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size);
+int setTMS99XXvramData(struct s_tms99XX * const p_tms99XX, void const * const p_data, int size);
 
 /***************************************************************************//**
  * @brief   Set all data in VRAM to a constant value of some size.
@@ -206,7 +202,7 @@ int setTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size);
  * @param   size number of bytes to set.
  * @return  actual number of bytes wrote.
  ******************************************************************************/
-int setTMS99XXvramConstData(struct s_tms99XX *p_tms99XX, uint8_t data, int size);
+int setTMS99XXvramConstData(struct s_tms99XX * const p_tms99XX, uint8_t const data, int size);
 
 /***************************************************************************//**
  * @brief   Read array of byte data to VRAM.
@@ -216,7 +212,7 @@ int setTMS99XXvramConstData(struct s_tms99XX *p_tms99XX, uint8_t data, int size)
  * @param   size number of bytes to read from vram.
  * @return  actual number of bytes read.
  ******************************************************************************/
-int getTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size);
+int getTMS99XXvramData(struct s_tms99XX * const p_tms99XX, void *p_data, int size);
 
 /***************************************************************************//**
  * @brief   Read status register of VDP.
@@ -224,7 +220,7 @@ int getTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size);
  * @param   p_tms99XX pointer to struct to contain port data.
  * @return  Status register data byte.
  ******************************************************************************/
-uint8_t getTMS99XXstatus(struct s_tms99XX *p_tms99XX);
+uint8_t getTMS99XXstatus(struct s_tms99XX * const p_tms99XX);
 
 /***************************************************************************//**
  * @brief   Clear all data from VRAM from 0x0000 to 0x3FFF. This will block 
@@ -232,7 +228,7 @@ uint8_t getTMS99XXstatus(struct s_tms99XX *p_tms99XX);
  * 
  * @param   p_tms99XX pointer to struct to contain port data.
  ******************************************************************************/
-void clearTMS99XXvramData(struct s_tms99XX *p_tms99XX);
+void clearTMS99XXvramData(struct s_tms99XX * const p_tms99XX);
 
 /***************************************************************************//**
  * @brief   Test all VRAM. This will block till all data written.
@@ -240,6 +236,6 @@ void clearTMS99XXvramData(struct s_tms99XX *p_tms99XX);
  * @param   p_tms99XX pointer to struct to contain port data.
  * @return  0 for error, 1 for pass.
  ******************************************************************************/
-uint8_t checkTMS99XXvram(struct s_tms99XX *p_tms99XX);
+uint8_t checkTMS99XXvram(struct s_tms99XX * const p_tms99XX);
 
 #endif

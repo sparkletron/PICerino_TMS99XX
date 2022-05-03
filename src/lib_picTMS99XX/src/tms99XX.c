@@ -42,28 +42,28 @@
 
 /** SEE MY PRIVATES **/
 /*** read VDP status register ***/
-inline uint8_t readVDPstatus(struct s_tms99XX *p_tms99XX);
+inline uint8_t readVDPstatus(struct s_tms99XX * const p_tms99XX);
 /*** read VDP vram ***/
-inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen);
+inline int readVDPvram(struct s_tms99XX * const p_tms99XX, uint8_t *p_data, int size, int modLen);
 /*** write VDP vram ***/
-inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen);
+inline int writeVDPvram(struct s_tms99XX * const p_tms99XX, uint8_t const * const p_data, int size, int modLen);
 /*** set write or read VDP vram address ***/
-inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address, int rnw);
+inline void writeVDPvramAddr(struct s_tms99XX * const p_tms99XX, uint16_t address, int rnw);
 /*** write VDP registers ***/
-inline void writeVDPregister(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_t data);
+inline void writeVDPregister(struct s_tms99XX * const p_tms99XX, uint8_t regNum, uint8_t data);
 /*** graphics mode ***/
-inline void initVDPmode(struct s_tms99XX *p_tms99XX);
+inline void initVDPmode(struct s_tms99XX * const p_tms99XX);
 /*** reset vdp ***/
-inline void resetVDP(struct s_tms99XX *p_tms99XX);
+inline void resetVDP(struct s_tms99XX * const p_tms99XX);
 /** bit setters **/
 /*** NO NULL CHECK, USED INSIDE FUNCTIONS THAT DO THAT FIRST ***/
-inline void setCtrlBitToOne(struct s_tms99XX *p_tms99XX, uint8_t bitNum);
-inline void setCtrlBitToZero(struct s_tms99XX *p_tms99XX, uint8_t bitNum);
+inline void setCtrlBitToOne(struct s_tms99XX * const p_tms99XX, uint8_t bitNum);
+inline void setCtrlBitToZero(struct s_tms99XX * const p_tms99XX, uint8_t bitNum);
 
 /** INITIALIZE AND FREE MY STRUCTS **/
 
 /*** Initialize TMS99XX ports for correct I/O and set pin numbers ***/
-void initTMS99XXport(struct s_tms99XX *p_tms99XX, volatile unsigned char *p_dataTRIS, volatile unsigned char *p_ctrlTRIS, volatile unsigned char *p_intTRIS, uint8_t nCSR, uint8_t nCSW, uint8_t mode, uint8_t nreset, uint8_t nINT)
+void initTMS99XXport(struct s_tms99XX * const p_tms99XX, volatile unsigned char *p_dataTRIS, volatile unsigned char *p_ctrlTRIS, volatile unsigned char *p_intTRIS, uint8_t nCSR, uint8_t nCSW, uint8_t mode, uint8_t nreset, uint8_t nINT)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -89,7 +89,7 @@ void initTMS99XXport(struct s_tms99XX *p_tms99XX, volatile unsigned char *p_data
   p_tms99XX->nINT = nINT;
   
   /**** setup control ports to default state ****/
-  *p_tms99XX->p_dataTRIS = ~0;
+  *p_tms99XX->p_dataTRIS = 0xFF;
   
   *p_ctrlTRIS &= (unsigned char)~((1 << nCSR) | (1 << nCSW) | (1 << mode) | (1 << nreset));
   
@@ -97,7 +97,7 @@ void initTMS99XXport(struct s_tms99XX *p_tms99XX, volatile unsigned char *p_data
 }
 
 /*** Initialize TMS99XX struct with ports to use for input output, must match direction registers above. ***/
-void initTMS99XX(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t backColor, volatile unsigned char *p_dataPortW, volatile unsigned char *p_dataPortR, volatile unsigned char *p_ctrlPortW, volatile unsigned char *p_intPortR)
+void initTMS99XX(struct s_tms99XX * const p_tms99XX, uint8_t vdpMode, uint8_t backColor, volatile unsigned char *p_dataPortW, volatile unsigned char *p_dataPortR, volatile unsigned char *p_ctrlPortW, volatile unsigned char *p_intPortR)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -160,20 +160,18 @@ void initTMS99XX(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t backColor
 }
 
 /*** Set the TMS99XX mode to one of 4. Text, Graphics I, Graphics II, and bitmap. ***/
-void setTMS99XXmode(struct s_tms99XX *p_tms99XX, uint8_t vdpMode, uint8_t register1)
+void setTMS99XXmode(struct s_tms99XX * const p_tms99XX, uint8_t vdpMode)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
   
   p_tms99XX->vdpMode = vdpMode;
   
-  p_tms99XX->register1 = register1;
-  
   initVDPmode(p_tms99XX);
 }
 
 /*** Set the TMS99XX to blank the current sprite and pattern planes. ***/
-void setTMS99XXblank(struct s_tms99XX *p_tms99XX, uint8_t mode)
+void setTMS99XXblank(struct s_tms99XX * const p_tms99XX, uint8_t mode)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -192,7 +190,7 @@ void setTMS99XXblank(struct s_tms99XX *p_tms99XX, uint8_t mode)
 }
 
 /*** Set the TMS99XX to irq to enabled or disabled. ***/
-void setTMS99XXirq(struct s_tms99XX *p_tms99XX, uint8_t mode)
+void setTMS99XXirq(struct s_tms99XX * const p_tms99XX, uint8_t mode)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -210,7 +208,7 @@ void setTMS99XXirq(struct s_tms99XX *p_tms99XX, uint8_t mode)
 }
 
 /*** Set the TMS99XX to sprite size to 8x8 or 16x16. ***/
-void setTMS99XXspriteSize(struct s_tms99XX *p_tms99XX, uint8_t mode)
+void setTMS99XXspriteSize(struct s_tms99XX * const p_tms99XX, uint8_t mode)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -228,7 +226,7 @@ void setTMS99XXspriteSize(struct s_tms99XX *p_tms99XX, uint8_t mode)
 }
 
 /*** Set the TMS99XX to sprite magnify to on or off (double set size). ***/
-void setTMS99XXspriteMagnify(struct s_tms99XX *p_tms99XX, uint8_t mode)
+void setTMS99XXspriteMagnify(struct s_tms99XX * const p_tms99XX, uint8_t mode)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -246,7 +244,7 @@ void setTMS99XXspriteMagnify(struct s_tms99XX *p_tms99XX, uint8_t mode)
 }
 
 /*** Set the TMS99XX text color in text mode. ***/
-void setTMS99XXtxtColor(struct s_tms99XX *p_tms99XX, uint8_t color)
+void setTMS99XXtxtColor(struct s_tms99XX * const p_tms99XX, uint8_t color)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -257,7 +255,7 @@ void setTMS99XXtxtColor(struct s_tms99XX *p_tms99XX, uint8_t color)
 }
 
 /*** Set the TMS99XX background color. ***/
-void setTMS99XXbackgroundColor(struct s_tms99XX *p_tms99XX, uint8_t color)
+void setTMS99XXbackgroundColor(struct s_tms99XX * const p_tms99XX, uint8_t color)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -268,13 +266,13 @@ void setTMS99XXbackgroundColor(struct s_tms99XX *p_tms99XX, uint8_t color)
 }
 
 /*** Set a register with a 8 bit value. ***/
-void setTMS99XXreg(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_t regData)
+void setTMS99XXreg(struct s_tms99XX * const p_tms99XX, uint8_t regNum, uint8_t regData)
 {
   writeVDPregister(p_tms99XX, regNum, regData);
 }
 
 /*** Write a struct/union table to vram using address. Alighned to data size. ***/
-int setTMS99XXvramTableData(struct s_tms99XX *p_tms99XX, uint16_t tableAddr, void *p_data, int startNum, int number, int size)
+int setTMS99XXvramTableData(struct s_tms99XX * const p_tms99XX, uint16_t tableAddr, void const * const p_data, int startNum, int number, int size)
 {
   int index = 0;
   
@@ -285,46 +283,46 @@ int setTMS99XXvramTableData(struct s_tms99XX *p_tms99XX, uint16_t tableAddr, voi
 }
 
 /*** Set the start of the write VRAM address. After this is set writes will auto increment the address. ***/
-void setTMS99XXvramWriteAddr(struct s_tms99XX *p_tms99XX, uint16_t vramAddr)
+void setTMS99XXvramWriteAddr(struct s_tms99XX * const p_tms99XX, uint16_t vramAddr)
 {
   writeVDPvramAddr(p_tms99XX, vramAddr, 0);
 }
 
 /*** Set the start of the read VRAM. After this is set read will auto increment the address. ***/
-void setTMS99XXvramReadAddr(struct s_tms99XX *p_tms99XX, uint16_t vramAddr)
+void setTMS99XXvramReadAddr(struct s_tms99XX * const p_tms99XX, uint16_t vramAddr)
 {
   writeVDPvramAddr(p_tms99XX, vramAddr, 1);
 }
 
 /*** Write array of byte data to VRAM. ***/
-int setTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size)
+int setTMS99XXvramData(struct s_tms99XX * const p_tms99XX, void const * const p_data, int size)
 {
   return writeVDPvram(p_tms99XX, (uint8_t *)p_data, size, size);
 }
 
 /*** constant value to VRAM. ***/
-int setTMS99XXvramConstData(struct s_tms99XX *p_tms99XX, uint8_t data, int size)
+int setTMS99XXvramConstData(struct s_tms99XX * const p_tms99XX, uint8_t const data, int size)
 {
   return writeVDPvram(p_tms99XX, &data, size, 1);
 }
 
 /*** Read array of byte data to VRAM. ***/
-int getTMS99XXvramData(struct s_tms99XX *p_tms99XX, void *p_data, int size)
+int getTMS99XXvramData(struct s_tms99XX * const p_tms99XX, void *p_data, int size)
 {
   return readVDPvram(p_tms99XX, (uint8_t *)p_data, size, size);
 }
 
 /*** Read status register of VDP. ***/
-uint8_t getTMS99XXstatus(struct s_tms99XX *p_tms99XX)
+uint8_t getTMS99XXstatus(struct s_tms99XX * const p_tms99XX)
 {
   return readVDPstatus(p_tms99XX);
 }
 
 /*** clear data from VRAM. ***/
-void clearTMS99XXvramData(struct s_tms99XX *p_tms99XX)
+void clearTMS99XXvramData(struct s_tms99XX * const p_tms99XX)
 {
+  int      index = 0;
   uint8_t  data = 0x00;
-  uint16_t index = 0;
   uint16_t amtWrote = 0;
   
   /**** set start address to write 0x00 to all of the VRAM ****/
@@ -337,10 +335,10 @@ void clearTMS99XXvramData(struct s_tms99XX *p_tms99XX)
 }
 
 /*** check vram with read write check ***/
-uint8_t checkTMS99XXvram(struct s_tms99XX *p_tms99XX)
+uint8_t checkTMS99XXvram(struct s_tms99XX * const p_tms99XX)
 {
   /**** future improvemtn, crc check of some sort ****/
-  uint16_t index = 0;
+  int      index = 0;
   uint16_t bufIndex = 0;
   uint8_t  buffer[256] = {0};
   uint8_t  data = 0x55;
@@ -378,7 +376,7 @@ uint8_t checkTMS99XXvram(struct s_tms99XX *p_tms99XX)
 
 /** SEE MY PRIVATES **/
 /*** read VDP status register ***/
-inline uint8_t readVDPstatus(struct s_tms99XX *p_tms99XX)
+inline uint8_t readVDPstatus(struct s_tms99XX * const p_tms99XX)
 {
   uint8_t tempData;
   
@@ -407,7 +405,7 @@ inline uint8_t readVDPstatus(struct s_tms99XX *p_tms99XX)
 }
 
 /*** read VDP vram ***/
-inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen)
+inline int readVDPvram(struct s_tms99XX * const p_tms99XX, uint8_t *p_data, int size, int modLen)
 {
   int index = 0;
   
@@ -470,7 +468,7 @@ inline int readVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, i
 }
 
 /*** write VDP vram ***/
-inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, int modLen)
+inline int writeVDPvram(struct s_tms99XX * const p_tms99XX, uint8_t const * const p_data, int size, int modLen)
 {
   int index = 0;
   
@@ -536,7 +534,7 @@ inline int writeVDPvram(struct s_tms99XX *p_tms99XX, uint8_t *p_data, int size, 
 }
 
 /*** write VDP registers ***/
-inline void writeVDPregister(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_t data)
+inline void writeVDPregister(struct s_tms99XX * const p_tms99XX, uint8_t regNum, uint8_t data)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -573,7 +571,7 @@ inline void writeVDPregister(struct s_tms99XX *p_tms99XX, uint8_t regNum, uint8_
 }
 
 /*** set write or read VDP vram address ***/
-inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address, int rnw)
+inline void writeVDPvramAddr(struct s_tms99XX * const p_tms99XX, uint16_t address, int rnw)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -611,7 +609,7 @@ inline void writeVDPvramAddr(struct s_tms99XX *p_tms99XX, uint16_t address, int 
 
 /*** set modes by setting vdpMode ***/
 /*** Default method per TI-VDP-Programmers_Guide.pdf ***/
-inline void initVDPmode(struct s_tms99XX *p_tms99XX)
+inline void initVDPmode(struct s_tms99XX * const p_tms99XX)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -629,36 +627,36 @@ inline void initVDPmode(struct s_tms99XX *p_tms99XX)
   writeVDPregister(p_tms99XX, REGISTER_1, p_tms99XX->register1);
   
   /**** setup register 2 for a name table address ****/
-  writeVDPregister(p_tms99XX, REGISTER_2, p_tms99XX->nameTableAddr >> NAME_TABLE_ADDR_SCALE);
+  writeVDPregister(p_tms99XX, REGISTER_2, (unsigned char)(p_tms99XX->nameTableAddr >> NAME_TABLE_ADDR_SCALE));
   
   if(p_tms99XX->vdpMode == GFXII_MODE)
   {
     /**** setup register 3 for a color table address GFX II has two fixed values for its only two addresses ****/
-    writeVDPregister(p_tms99XX, REGISTER_3, (uint8_t)((p_tms99XX->colorTableAddr == 0x0000) ? 0x7F : 0xFF));
+    writeVDPregister(p_tms99XX, REGISTER_3, (unsigned char)((p_tms99XX->colorTableAddr == 0x0000) ? 0x7F : 0xFF));
     
     /**** setup register 4 for pattern table address GFX II has two fixed values for its only two addresses  ****/
-    writeVDPregister(p_tms99XX, REGISTER_4, (uint8_t)((p_tms99XX->patternTableAddr == 0x0000) ? 0x03 : 0x07));
+    writeVDPregister(p_tms99XX, REGISTER_4, (unsigned char)((p_tms99XX->patternTableAddr == 0x0000) ? 0x03 : 0x07));
   }
   else
   {
     if(p_tms99XX->vdpMode != TXT_MODE)
     {
       /**** setup register 3 for a color table address ****/
-      writeVDPregister(p_tms99XX, REGISTER_3, p_tms99XX->colorTableAddr >> COLOR_TABLE_ADDR_SCALE);
+      writeVDPregister(p_tms99XX, REGISTER_3, (unsigned char)(p_tms99XX->colorTableAddr >> COLOR_TABLE_ADDR_SCALE));
     }
     
     /**** setup register 4 for pattern table address  ****/
-    writeVDPregister(p_tms99XX, REGISTER_4, p_tms99XX->patternTableAddr >> PATTERN_TABLE_ADDR_SCALE);
+    writeVDPregister(p_tms99XX, REGISTER_4, (unsigned char)(p_tms99XX->patternTableAddr >> PATTERN_TABLE_ADDR_SCALE));
   }
   
   
   if(p_tms99XX->vdpMode != TXT_MODE)
   {
     /**** setup register 5 for sprite attribute table address ****/
-    writeVDPregister(p_tms99XX, REGISTER_5, p_tms99XX->spriteAttributeAddr >> SPRITE_ATTRIBUTE_TABLE_ADDR_SCALE);
+    writeVDPregister(p_tms99XX, REGISTER_5, (unsigned char)(p_tms99XX->spriteAttributeAddr >> SPRITE_ATTRIBUTE_TABLE_ADDR_SCALE));
     
     /**** setup register 6 for sprite pattern table address ****/
-    writeVDPregister(p_tms99XX, REGISTER_6, p_tms99XX->spritePatternAddr >> SPRITE_PATTERN_TABLE_ADDR_SCALE);
+    writeVDPregister(p_tms99XX, REGISTER_6, (unsigned char)(p_tms99XX->spritePatternAddr >> SPRITE_PATTERN_TABLE_ADDR_SCALE));
   }
   
   /**** setup register 7 for backdrop color ****/
@@ -666,7 +664,7 @@ inline void initVDPmode(struct s_tms99XX *p_tms99XX)
 }
 
 /*** reset vdp ***/
-inline void resetVDP(struct s_tms99XX *p_tms99XX)
+inline void resetVDP(struct s_tms99XX * const p_tms99XX)
 {
   /**** NULL Check ****/
   if(!p_tms99XX) return;
@@ -686,13 +684,13 @@ inline void resetVDP(struct s_tms99XX *p_tms99XX)
 }
 
 /*** set bit to one ***/
-inline void setCtrlBitToOne(struct s_tms99XX *p_tms99XX, uint8_t bitNum)
+inline void setCtrlBitToOne(struct s_tms99XX * const p_tms99XX, uint8_t bitNum)
 {
   *p_tms99XX->p_ctrlPortW |= (unsigned char)(1 << bitNum);
 }
 
 /*** set bit to zero ***/
-inline void setCtrlBitToZero(struct s_tms99XX *p_tms99XX, uint8_t bitNum)
+inline void setCtrlBitToZero(struct s_tms99XX * const p_tms99XX, uint8_t bitNum)
 {
   *p_tms99XX->p_ctrlPortW &= (unsigned char)~(1 << bitNum);
 }

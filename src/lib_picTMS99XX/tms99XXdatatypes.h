@@ -241,19 +241,6 @@ union u_tms99XX_patternTable8x8
 };
 
 /**
- * @struct s_tms99XX_patternTable6x8
- * @brief Struct for containing a 6x8 pattern table
- */
-struct s_tms99XX_patternTable6x8
-{
-  /**
-   * @var s_tms99XX_patternTable6x8::data
-   * array of 8 bytes for a 6x8 matrix. (2 bits ignored)
-   */
-  uint8_t data[8];
-};
-
-/**
  * @struct s_tms99XX_nameTable
  * @brief Struct for containing TMS99XX instances 
  */

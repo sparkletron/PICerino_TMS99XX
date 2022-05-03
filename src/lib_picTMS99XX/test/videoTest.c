@@ -30,7 +30,7 @@
 #pragma config MCLRE    = OFF
 
 //needed since chip is read-modify write only, and read in the same line doesn't work
-uint8_t g_porteBuffer = 0;
+unsigned char g_porteBuffer = 0;
 
 void main(void) 
 {
@@ -49,8 +49,17 @@ void main(void)
   
   char tag[] = "2022 Jay Convertino";
   
-  /* create struct to store ascii name table in order */
-  uint8_t nameTable[(sizeof(c_tms99XX_ascii) - (32 * 8))/8] = {0};
+  /* GFX 8x8 characters */
+  struct s_tms99XX_spritePatternTable8x8 tms8x8characters[] =
+  {
+    {{0x99, 0x66, 0x66, 0x99, 0x99, 0x66, 0x66, 0x99}}
+  };
+  
+  /* sprite 1 */
+  union u_tms99XX_spriteAttributeTable spriteOne = {0};
+  
+  /* create struct to store ascii name table in order, skipping first 32 null patterns */
+  uint8_t nameTable[1 + (sizeof(c_tms99XX_ascii) - (32 * 8))/8] = {0};
 
   /* buffer array to scoll a text line */
   uint8_t scrollArray[40] = {0};
@@ -96,7 +105,7 @@ void main(void)
   initTMS99XXport(&tms99XX, &TRISB, &TRISD, &TRISC, 3, 2, 0, 1, 6);
   
   /* setup tms9928 chip and finish setting up struct */
-  initTMS99XX(&tms99XX, TXT_MODE, TMS_DARK_GREEN, &LATB, &PORTB, &LATD, &PORTC);
+  initTMS99XX(&tms99XX, GFXI_MODE, TMS_TRANSPARENT, &LATB, &PORTB, &LATD, &PORTC);
   
   setTMS99XXtxtColor(&tms99XX, TMS_WHITE);
   
@@ -112,13 +121,67 @@ void main(void)
   /* clear all ti vdp memory */
   clearTMS99XXvramData(&tms99XX);
   
-  /* MODE TESTS */
+  __delay_ms(1000);
   
-  /* 1ST: TEXT MODE */
+  /* test all 16 background colors */
+  for(index = 0; index <= TMS_WHITE; index++)
+  {
+    setTMS99XXbackgroundColor(&tms99XX, index);
+    __delay_ms(1000);
+  }
+  
+  /* set to light blue for various tests */
+  setTMS99XXbackgroundColor(&tms99XX, TMS_LIGHT_BLUE);
+  
+  /* MODE TESTS */
+  /* FIRST: GFX I MODE, NORMAL 8x8 NO MAG*/
+  setTMS99XXmode(&tms99XX, GFXI_MODE);
+  
+  setTMS99XXvramWriteAddr(&tms99XX, SPRITE_PATTERN_TABLE_ADDR);
+  
+  setTMS99XXvramData(&tms99XX, tms8x8characters, sizeof(tms8x8characters));
+  
+  spriteOne.dataNibbles.verticalPos = 0xFF;
+  
+  spriteOne.dataNibbles.horizontalPos = 0x00;
+  
+  spriteOne.dataNibbles.name = 0;
+  
+  spriteOne.dataNibbles.colorCode = TMS_DARK_RED;
+  
+  setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
+  
+  setTMS99XXvramData(&tms99XX, &spriteOne, sizeof(spriteOne));
+  
+  /* enable screen */
+  setTMS99XXblank(&tms99XX, 0);
+  
+  for(index = 0; index < 10; index++)
+  {
+    LATE = g_porteBuffer;
+    
+    g_porteBuffer = (unsigned char)(g_porteBuffer == 4 ? 1 : g_porteBuffer << 1);
+    
+    __delay_ms(1000);
+  }
+  
+  LATE = 0;
+  
+  /* disable screen */
+  setTMS99XXblank(&tms99XX, 1);
+  
+  /* clear all ti vdp memory */
+  clearTMS99XXvramData(&tms99XX);
+  
+  /* LAST: TEXT MODE */
+  setTMS99XXmode(&tms99XX, TXT_MODE);
+  
   /* write to pattern table */
   setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
 
   setTMS99XXvramData(&tms99XX, c_tms99XX_ascii, sizeof(c_tms99XX_ascii));
+  
+  setTMS99XXvramData(&tms99XX, tms8x8characters, sizeof(tms8x8characters));
   
   /* first ascii letter is space in this table, no image */
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
@@ -129,6 +192,7 @@ void main(void)
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
   
   setTMS99XXvramData(&tms99XX, nameTable, sizeof(nameTable));
+  
   
   /* write hello world on line 12 */
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR + (40 * 11));
@@ -153,7 +217,7 @@ void main(void)
   for(;;)
   {
     LATE = g_porteBuffer;
-    g_porteBuffer = (g_porteBuffer == 4 ? 1 : (unsigned)g_porteBuffer << 1);
+    g_porteBuffer = (unsigned char)(g_porteBuffer == 4 ? 1 : g_porteBuffer << 1);
     
     __delay_ms(50);
     
