@@ -306,6 +306,32 @@ int setTMS99XXvramConstData(struct s_tms99XX * const p_tms99XX, uint8_t const da
   return writeVDPvram(p_tms99XX, &data, size, 1);
 }
 
+/*** set sprite to a terminator value ***/
+void setTMS99XXvramSpriteTerm(struct s_tms99XX * const p_tms99XX, uint8_t const num)
+{
+  if(!p_tms99XX) return;
+  
+  /**** terminator sprite ****/
+  union u_tms99XX_spriteAttributeTable spriteTerm = {0};
+  
+  spriteTerm.dataNibbles.verticalPos = SPRITE_TERM;
+  
+  spriteTerm.dataNibbles.horizontalPos = 0;
+  
+  spriteTerm.dataNibbles.name = 0;
+  
+  spriteTerm.dataNibbles.earlyClockBit = 0;
+  
+  spriteTerm.dataNibbles.na = 0;
+  
+  spriteTerm.dataNibbles.colorCode = TMS_TRANSPARENT;
+  
+  writeVDPvramAddr(p_tms99XX, p_tms99XX->spriteAttributeAddr + (num * sizeof(spriteTerm)), 1);
+  
+  /**** no need to check return, plenty of time to write 4 bytes ****/
+  writeVDPvram(p_tms99XX, (uint8_t const * const)&spriteTerm, sizeof(spriteTerm), sizeof(spriteTerm));
+}
+
 /*** Read array of byte data to VRAM. ***/
 int getTMS99XXvramData(struct s_tms99XX * const p_tms99XX, void *p_data, int size)
 {

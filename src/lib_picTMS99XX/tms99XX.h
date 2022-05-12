@@ -205,6 +205,15 @@ int setTMS99XXvramData(struct s_tms99XX * const p_tms99XX, void const * const p_
 int setTMS99XXvramConstData(struct s_tms99XX * const p_tms99XX, uint8_t const data, int size);
 
 /***************************************************************************//**
+ * @brief   Set all vertical field of selected sprite number to the 0xD0. The 
+ *          sprite terminator.
+ * 
+ * @param   p_tms99XX pointer to struct to contain port data.
+ * @param   num  the sprite number 0 to 31 to terminate.
+ ******************************************************************************/
+void setTMS99XXvramSpriteTerm(struct s_tms99XX * const p_tms99XX, uint8_t const num);
+
+/***************************************************************************//**
  * @brief   Read array of byte data to VRAM.
  * 
  * @param   p_tms99XX pointer to struct to contain port data.

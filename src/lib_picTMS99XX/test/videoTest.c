@@ -35,7 +35,7 @@ unsigned char g_porteBuffer = 0;
 void main(void) 
 {
   /* happy fun time variables */
-  uint8_t   index = 0;
+  int       index = 0;
   uint16_t  freq = 0;
   uint8_t   attn = 0;
   uint8_t   shiftRate = 0;
@@ -73,7 +73,7 @@ void main(void)
   /* create nametable to display all ascii characters */
   for(index = 32; index < sizeof(nameTable)+32; index++)
   {
-    nameTable[index-32] = index;
+    nameTable[index-32] = (unsigned char)index;
   }
   
   /* OSCCON SETUP */
@@ -132,7 +132,7 @@ void main(void)
   /* test all 16 background colors */
   for(index = 0; index <= TMS_WHITE; index++)
   {
-    setTMS99XXbackgroundColor(&tms99XX, index);
+    setTMS99XXbackgroundColor(&tms99XX, (unsigned char)index);
     __delay_ms(1000);
   }
   
@@ -178,13 +178,17 @@ void main(void)
   /* enable screen */
   setTMS99XXblank(&tms99XX, 0);
   
-  for(;;)
+  for(index = 0; index < 1000; index++)
   {
     LATE = g_porteBuffer;
     
     g_porteBuffer = (unsigned char)(g_porteBuffer == 4 ? 1 : g_porteBuffer << 1);
     
-    __delay_ms(1000);
+    __delay_ms(10);
+    
+    spriteOne.dataNibbles.verticalPos -= 5;
+    
+    spriteOne.dataNibbles.horizontalPos += 5;
     
     setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
   

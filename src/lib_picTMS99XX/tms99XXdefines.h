@@ -273,4 +273,10 @@
  */
 #define MEM_SIZE (1 << 14)
 
+/**
+ * @def SPRITE_TERM
+ * Vertical field can contain a terminator value of 0xD0 to stop sprite processing.
+ */
+#define SPRITE_TERM 0xD0
+
 #endif
