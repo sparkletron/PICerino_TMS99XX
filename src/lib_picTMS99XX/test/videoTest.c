@@ -55,6 +55,12 @@ void main(void)
     {{0x99, 0x66, 0x66, 0x99, 0x99, 0x66, 0x66, 0x99}}
   };
   
+  /* Pattern table */
+  //union u_tms99XX_patternTable8x8 patternTable[] = {{.data = {0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55}}};
+  
+  /* color table */
+  //union u_tms99XX_colorTable colorTable[32] = {{.data = (TMS_LIGHT_RED << 4 | TMS_CYAN)}};
+  
   /* sprite 1 */
   union u_tms99XX_spriteAttributeTable spriteOne = {0};
   
@@ -137,15 +143,31 @@ void main(void)
   /* FIRST: GFX I MODE, NORMAL 8x8 NO MAG*/
   setTMS99XXmode(&tms99XX, GFXI_MODE);
   
+  setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
+  
+ // setTMS99XXvramData(&tms99XX, &c_tms99XX_ascii[55], 8);
+  
+ // setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
+  
+ // setTMS99XXvramConstData(&tms99XX, 0, 768);
+  
+  setTMS99XXvramWriteAddr(&tms99XX, COLOR_TABLE_ADDR);
+  
+  setTMS99XXvramConstData(&tms99XX, (TMS_LIGHT_RED << 4 | TMS_CYAN), 32);
+  
   setTMS99XXvramWriteAddr(&tms99XX, SPRITE_PATTERN_TABLE_ADDR);
   
   setTMS99XXvramData(&tms99XX, tms8x8characters, sizeof(tms8x8characters));
   
   spriteOne.dataNibbles.verticalPos = 0xFF;
   
-  spriteOne.dataNibbles.horizontalPos = 0x00;
+  spriteOne.dataNibbles.horizontalPos = 0;
   
   spriteOne.dataNibbles.name = 0;
+  
+  spriteOne.dataNibbles.earlyClockBit = 0;
+  
+  spriteOne.dataNibbles.na = 0;
   
   spriteOne.dataNibbles.colorCode = TMS_DARK_RED;
   
@@ -156,13 +178,17 @@ void main(void)
   /* enable screen */
   setTMS99XXblank(&tms99XX, 0);
   
-  for(index = 0; index < 10; index++)
+  for(;;)
   {
     LATE = g_porteBuffer;
     
     g_porteBuffer = (unsigned char)(g_porteBuffer == 4 ? 1 : g_porteBuffer << 1);
     
     __delay_ms(1000);
+    
+    setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
+  
+    setTMS99XXvramData(&tms99XX, &spriteOne, sizeof(spriteOne));
   }
   
   LATE = 0;

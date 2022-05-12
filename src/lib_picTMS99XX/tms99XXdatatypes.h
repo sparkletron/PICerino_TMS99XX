@@ -149,7 +149,7 @@ union u_tms99XX_patternTable8x8
   * @struct u_tms99XX_patternTable8x8::s_pDataNibbles
   * contains color fields for bitmap mode. see page 2-22 of TMS9918 data manual.
   */
-  struct s_pDataNibbles
+  __pack struct s_pDataNibbles
   {
     /**
     * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorA
@@ -263,16 +263,16 @@ union u_tms99XX_colorTable
   * @struct u_tms99XX_colorTable::s_cDataNibbles
   * contains color fields
   */
-  struct s_cDataNibbles
+  __pack struct s_cDataNibbles
   {
     /**
     * @var u_tms99XX_colorTable::s_cDataNibbles::color1
-    * top nibble, color 1
+    * top nibble, color for 1
     */
     uint8_t color1:4;
     /**
     * @var u_tms99XX_colorTable::s_cDataNibbles::color2
-    * bottom nibble, color 2
+    * bottom nibble, color for 0
     */
     uint8_t color2:4;
   } dataNibbles;
@@ -320,7 +320,7 @@ union u_tms99XX_spriteAttributeTable
   * @struct u_tms99XX_spriteAttributeTable::s_dataNibbles
   * contains sprite attribute fields
   */
-  struct s_dataNibbles
+  __pack struct s_dataNibbles
   {
     /**
     * @var u_tms99XX_spriteAttributeTable::s_dataNibbles::verticalPos
@@ -338,20 +338,20 @@ union u_tms99XX_spriteAttributeTable
     */
     uint8_t name;
     /**
-    * @var u_tms99XX_spriteAttributeTable::s_dataNibbles::earlyClockBit
-    * feature for slow movement of sprites off screen.
-    */
-    uint8_t earlyClockBit:1;
-    /**
-    * @var u_tms99XX_spriteAttributeTable::s_dataNibbles::na
-    * nothing, always set to 0.
-    */
-    uint8_t na:3;
-    /**
     * @var u_tms99XX_spriteAttributeTable::s_dataNibbles::colorCode
-    * color to set sprite pixels.
+    * color to set sprite pixels. this is the lower 4 bits (3 to 0)
     */
     uint8_t colorCode:4;
+    /**
+    * @var u_tms99XX_spriteAttributeTable::s_dataNibbles::na
+    * nothing, always set to 0. bits 6 to 4.
+    */
+    uint8_t na:3;
+      /**
+    * @var u_tms99XX_spriteAttributeTable::s_dataNibbles::earlyClockBit
+    * feature for slow movement of sprites off screen. bit 7
+    */
+    uint8_t earlyClockBit:1;
   } dataNibbles;
   
   /**

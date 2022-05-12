@@ -189,37 +189,37 @@
  * @def TMS_TRANSPARENT
  * transparent for all plans/sprites
  */
-#define TMS_TRANSPARENT 0x0
+#define TMS_TRANSPARENT 0x00
 /**
  * @def TMS_BLACK
  * color black
  */
-#define TMS_BLACK 0x1
+#define TMS_BLACK 0x01
 /**
  * @def TMS_MEDIUM_GREEN
  * color medium green
  */
-#define TMS_MEDIUM_GREEN 0x2
+#define TMS_MEDIUM_GREEN 0x02
 /**
  * @def TMS_LIGHT_GREEN
  * color light green
  */
-#define TMS_LIGHT_GREEN 0x3
+#define TMS_LIGHT_GREEN 0x03
 /**
  * @def TMS_DARK_BLUE
  * color dark blue
  */
-#define TMS_DARK_BLUE 0x4
+#define TMS_DARK_BLUE 0x04
 /**
  * @def TMS_LIGHT_BLUE
  * color light blue
  */
-#define TMS_LIGHT_BLUE 0x5
+#define TMS_LIGHT_BLUE 0x05
 /**
  * @def TMS_DARK_RED
  * color dark red
  */
-#define TMS_DARK_RED 0x6
+#define TMS_DARK_RED 0x06
 /**
  * @def TMS_CYAN
  * color cyan
@@ -229,42 +229,42 @@
  * @def TMS_MEDIUM_RED
  * color medium red
  */
-#define TMS_MEDIUM_RED 0x8
+#define TMS_MEDIUM_RED 0x08
 /**
  * @def TMS_LIGHT_RED
  * register
  */
-#define TMS_LIGHT_RED 0x9
+#define TMS_LIGHT_RED 0x09
 /**
  * @def TMS_DARK_YELLOW 
  * register
  */
-#define TMS_DARK_YELLOW 0xA
+#define TMS_DARK_YELLOW 0x0A
 /**
  * @def TMS_LIGHT_YELLOW
  * register
  */
-#define TMS_LIGHT_YELLOW 0xB
+#define TMS_LIGHT_YELLOW 0x0B
 /**
  * @def TMS_DARK_GREEN
  * register
  */
-#define TMS_DARK_GREEN 0xC
+#define TMS_DARK_GREEN 0x0C
 /**
  * @def TMS_MAGENTA
  * register
  */
-#define TMS_MAGENTA 0xD
+#define TMS_MAGENTA 0x0D
 /**
  * @def TMS_GREY
  * register
  */
-#define TMS_GREY 0xE
+#define TMS_GREY 0x0E
 /**
  * @def TMS_WHITE
  * register
  */
-#define TMS_WHITE 0xF
+#define TMS_WHITE 0x0F
 
 /** MISC DEFINES **/
 /**
