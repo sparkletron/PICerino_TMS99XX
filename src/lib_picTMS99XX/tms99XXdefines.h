@@ -142,7 +142,10 @@
 /**
  * @def COLOR_TABLE_ADDR
  * default address for color table (R3 * 0x40[2^6])
- * 0x2000 address is set when R3 is 0x80 (GFXII constrains this to FF!!)
+ * 0x2000 address is set when R3 is 0x80.
+ * 
+ * GFXII can only be 0x0000(0x7F) or 0x2000(0xFF) Init takes care of this, but
+ * this can be easily broken if a bad address is used for the color table.
  */
 #define COLOR_TABLE_ADDR 0x2000
 /**
@@ -153,7 +156,10 @@
 /**
  * @def PATTERN_TABLE_ADDR
  * default address for pattern table (R4 * 0x800[2^11])
- * 0x0000 address is set when R4 is 0x00 (GFX constrains this to 0x03)
+ * 0x0000 address is set when R4 is 0x00
+ * 
+ * GFXII can only be 0x0000(0x03) or 0x2000(0x07) Init takes care of this, but 
+ * this can be easily broken if a bad address is used for the pattern table.
  */
 #define PATTERN_TABLE_ADDR 0x0000
 /**

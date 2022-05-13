@@ -52,7 +52,10 @@ void main(void)
   /* GFX 8x8 characters */
   struct s_tms99XX_spritePatternTable8x8 tms8x8characters[] =
   {
-    {{0x99, 0x66, 0x66, 0x99, 0x99, 0x66, 0x66, 0x99}}
+    {{0x99, 0x66, 0x66, 0x99, 0x99, 0x66, 0x66, 0x99}},
+    {{0x18, 0x99, 0x5A, 0x3C, 0x18, 0x18, 0x24, 0x42}},
+    {{0x18, 0x99, 0x5A, 0x3C, 0x18, 0x18, 0x18, 0x24}},
+    {{0x18, 0x99, 0x5A, 0x3C, 0x18, 0x18, 0x18, 0x18}}
   };
   
   /* Pattern table */
@@ -62,7 +65,7 @@ void main(void)
   //union u_tms99XX_colorTable colorTable[32] = {{.data = (TMS_LIGHT_RED << 4 | TMS_CYAN)}};
   
   /* sprite 1 */
-  union u_tms99XX_spriteAttributeTable spriteOne = {0};
+  union u_tms99XX_spriteAttributeTable sprites[2] = {0};
   
   /* create struct to store ascii name table in order, skipping first 32 null patterns */
   uint8_t nameTable[1 + (sizeof(c_tms99XX_ascii) - (32 * 8))/8] = {0};
@@ -145,39 +148,56 @@ void main(void)
   
   setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
   
- // setTMS99XXvramData(&tms99XX, &c_tms99XX_ascii[55], 8);
+  setTMS99XXvramData(&tms99XX, c_tms99XX_ascii, sizeof(c_tms99XX_ascii));
   
- // setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
+  /* write 2022 Jay Convertino on top line */
+  setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
   
- // setTMS99XXvramConstData(&tms99XX, 0, 768);
+  setTMS99XXvramData(&tms99XX, tag, sizeof(tag)); 
   
   setTMS99XXvramWriteAddr(&tms99XX, COLOR_TABLE_ADDR);
   
-  setTMS99XXvramConstData(&tms99XX, (TMS_LIGHT_RED << 4 | TMS_CYAN), 32);
+  setTMS99XXvramConstData(&tms99XX, (TMS_BLACK << 4 | TMS_CYAN), 32);
   
   setTMS99XXvramWriteAddr(&tms99XX, SPRITE_PATTERN_TABLE_ADDR);
   
   setTMS99XXvramData(&tms99XX, tms8x8characters, sizeof(tms8x8characters));
   
-  spriteOne.dataNibbles.verticalPos = 0xFF;
+  /* setup sprite 0 */
+  sprites[0].dataNibbles.verticalPos = 0xFF;
   
-  spriteOne.dataNibbles.horizontalPos = 0;
+  sprites[0].dataNibbles.horizontalPos = 0;
   
-  spriteOne.dataNibbles.name = 0;
+  sprites[0].dataNibbles.name = 0;
   
-  spriteOne.dataNibbles.earlyClockBit = 0;
+  sprites[0].dataNibbles.earlyClockBit = 0;
   
-  spriteOne.dataNibbles.na = 0;
+  sprites[0].dataNibbles.na = 0;
   
-  spriteOne.dataNibbles.colorCode = TMS_DARK_RED;
+  sprites[0].dataNibbles.colorCode = TMS_DARK_RED;
   
+  /* setup sprite 1 */
+  sprites[1].dataNibbles.verticalPos = 177;
+  
+  sprites[1].dataNibbles.horizontalPos = 0;
+  
+  sprites[1].dataNibbles.name = 1;
+  
+  sprites[1].dataNibbles.earlyClockBit = 0;
+  
+  sprites[1].dataNibbles.na = 0;
+  
+  sprites[1].dataNibbles.colorCode = TMS_DARK_GREEN;
+  
+  /* write sprites to vram */
   setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
   
-  setTMS99XXvramData(&tms99XX, &spriteOne, sizeof(spriteOne));
+  setTMS99XXvramData(&tms99XX, sprites, sizeof(sprites));
   
   /* enable screen */
   setTMS99XXblank(&tms99XX, 0);
   
+  /* test GFX sprite in no mag mode */
   for(index = 0; index < 1000; index++)
   {
     LATE = g_porteBuffer;
@@ -186,14 +206,29 @@ void main(void)
     
     __delay_ms(10);
     
-    spriteOne.dataNibbles.verticalPos -= 5;
+    sprites[0].dataNibbles.verticalPos -= 5;
     
-    spriteOne.dataNibbles.horizontalPos += 5;
+    sprites[0].dataNibbles.horizontalPos += 5;
+    
+    sprites[1].dataNibbles.horizontalPos += 1;
+    
+    if(!(sprites[1].dataNibbles.horizontalPos % 16))
+    {
+      sprites[1].dataNibbles.name++;
+      
+      if(sprites[1].dataNibbles.name == 4) sprites[1].dataNibbles.name = 1;
+    }
     
     setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
   
-    setTMS99XXvramData(&tms99XX, &spriteOne, sizeof(spriteOne));
+    setTMS99XXvramData(&tms99XX, sprites, sizeof(sprites));
   }
+  
+  /* test GFX sprite in mag mode */
+  
+  /* test GFX large sprite in no mag mode */
+  
+  /* test GFX large sprite in mag mode */
   
   LATE = 0;
   
@@ -210,8 +245,6 @@ void main(void)
   setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
 
   setTMS99XXvramData(&tms99XX, c_tms99XX_ascii, sizeof(c_tms99XX_ascii));
-  
-  setTMS99XXvramData(&tms99XX, tms8x8characters, sizeof(tms8x8characters));
   
   /* first ascii letter is space in this table, no image */
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
