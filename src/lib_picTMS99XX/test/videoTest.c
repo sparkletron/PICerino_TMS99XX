@@ -135,12 +135,18 @@ void main(void)
   /* test all 16 background colors */
   for(index = 0; index <= TMS_WHITE; index++)
   {
+//     int delay_ind = 0;
+    
     setTMS99XXbackgroundColor(&tms99XX, (unsigned char)index);
-    __delay_ms(1000);
+    
+//     for(delay_ind = 0; delay_ind < 10; delay_ind++)
+//     {
+      __delay_ms(1000);
+//     }
   }
   
   /* set to light blue for various tests */
-  setTMS99XXbackgroundColor(&tms99XX, TMS_LIGHT_BLUE);
+  setTMS99XXbackgroundColor(&tms99XX, TMS_BLACK);
   
   /* MODE TESTS */
   /* FIRST: GFX I MODE, NORMAL 8x8 NO MAG*/
