@@ -10,6 +10,8 @@
 #include <tms99XX.h>
 #include <tms99XXascii.h>
 
+#define SPRITES_8X8_NUM 5
+
 /* configuration bits */
 #pragma config PLLSEL   = PLL3X
 #pragma config CFGPLLEN = ON
@@ -36,6 +38,7 @@ void main(void)
 {
   /* happy fun time variables */
   int       index = 0;
+  int       spriteIndex = 0;
   uint16_t  freq = 0;
   uint8_t   attn = 0;
   uint8_t   shiftRate = 0;
@@ -49,23 +52,24 @@ void main(void)
   
   char tag[] = "2022 Jay Convertino";
   
-  /* GFX 8x8 characters */
-  struct s_tms99XX_spritePatternTable8x8 tms8x8characters[] =
+  char gfxi[] = "GFX I";
+  
+  char gfximag[] = "GFX I MAG";
+  
+  char txtmode[] = "TXT";
+  
+  /* GFX 8x8 sprites */
+  struct s_tms99XX_spritePatternTable8x8 tms8x8sprites[] =
   {
-    {{0x99, 0x66, 0x66, 0x99, 0x99, 0x66, 0x66, 0x99}},
-    {{0x18, 0x99, 0x5A, 0x3C, 0x18, 0x18, 0x24, 0x42}},
-    {{0x18, 0x99, 0x5A, 0x3C, 0x18, 0x18, 0x18, 0x24}},
-    {{0x18, 0x99, 0x5A, 0x3C, 0x18, 0x18, 0x18, 0x18}}
+    {{0x99, 0x66, 0x66, 0x99, 0x99, 0x66, 0x66, 0x99}}, //ship 1
+    {{0x00, 0x18, 0x24, 0xFF, 0xFF, 0x24, 0x18, 0x00}}, //ship 2
+    {{0x24, 0x3C, 0x18, 0x3C, 0x66, 0x7E, 0xC3, 0xFF}}, //ship 3
+    {{0x24, 0x24, 0x24, 0x3C, 0x18, 0xFF, 0x66, 0xFF}}, //ship 4
+    {{0x81, 0x42, 0x3C, 0x18, 0x3C, 0x66, 0xFF, 0xFF}}  //ship 5
   };
   
-  /* Pattern table */
-  //union u_tms99XX_patternTable8x8 patternTable[] = {{.data = {0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55}}};
-  
-  /* color table */
-  //union u_tms99XX_colorTable colorTable[32] = {{.data = (TMS_LIGHT_RED << 4 | TMS_CYAN)}};
-  
   /* sprite 1 */
-  union u_tms99XX_spriteAttributeTable sprites[2] = {0};
+  union u_tms99XX_spriteAttributeTable sprites[SPRITES_8X8_NUM] = {0};
   
   /* create struct to store ascii name table in order, skipping first 32 null patterns */
   uint8_t nameTable[1 + (sizeof(c_tms99XX_ascii) - (32 * 8))/8] = {0};
@@ -124,34 +128,29 @@ void main(void)
   if(!checkTMS99XXvram(&tms99XX))
   {
     LATE = g_porteBuffer;
+    __delay_ms(2000);
     return;
   }
   
   /* clear all ti vdp memory */
   clearTMS99XXvramData(&tms99XX);
   
-  __delay_ms(1000);
-  
   /* test all 16 background colors */
   for(index = 0; index <= TMS_WHITE; index++)
   {
-//     int delay_ind = 0;
-    
     setTMS99XXbackgroundColor(&tms99XX, (unsigned char)index);
     
-//     for(delay_ind = 0; delay_ind < 10; delay_ind++)
-//     {
-      __delay_ms(1000);
-//     }
+    __delay_ms(1000);
   }
   
-  /* set to light blue for various tests */
-  setTMS99XXbackgroundColor(&tms99XX, TMS_BLACK);
+  /* set to TMS_CYAN for various tests */
+  setTMS99XXbackgroundColor(&tms99XX, TMS_CYAN);
   
   /* MODE TESTS */
   /* FIRST: GFX I MODE, NORMAL 8x8 NO MAG*/
   setTMS99XXmode(&tms99XX, GFXI_MODE);
   
+  /* ascii chars */
   setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
   
   setTMS99XXvramData(&tms99XX, c_tms99XX_ascii, sizeof(c_tms99XX_ascii));
@@ -161,44 +160,42 @@ void main(void)
   
   setTMS99XXvramData(&tms99XX, tag, sizeof(tag)); 
   
+  setTMS99XXvramData(&tms99XX, gfxi, sizeof(gfxi));
+  
+  /* set colors for all patterns */
   setTMS99XXvramWriteAddr(&tms99XX, COLOR_TABLE_ADDR);
   
-  setTMS99XXvramConstData(&tms99XX, (TMS_BLACK << 4 | TMS_CYAN), 32);
+  setTMS99XXvramConstData(&tms99XX, (TMS_DARK_BLUE << 4 | TMS_BLACK), 32);
   
   setTMS99XXvramWriteAddr(&tms99XX, SPRITE_PATTERN_TABLE_ADDR);
   
-  setTMS99XXvramData(&tms99XX, tms8x8characters, sizeof(tms8x8characters));
+  setTMS99XXvramData(&tms99XX, tms8x8sprites, sizeof(tms8x8sprites));
   
-  /* setup sprite 0 */
-  sprites[0].dataNibbles.verticalPos = 0xFF;
-  
-  sprites[0].dataNibbles.horizontalPos = 0;
-  
-  sprites[0].dataNibbles.name = 0;
-  
-  sprites[0].dataNibbles.earlyClockBit = 0;
-  
-  sprites[0].dataNibbles.na = 0;
-  
-  sprites[0].dataNibbles.colorCode = TMS_DARK_RED;
-  
-  /* setup sprite 1 */
-  sprites[1].dataNibbles.verticalPos = 177;
-  
-  sprites[1].dataNibbles.horizontalPos = 0;
-  
-  sprites[1].dataNibbles.name = 1;
-  
-  sprites[1].dataNibbles.earlyClockBit = 0;
-  
-  sprites[1].dataNibbles.na = 0;
-  
-  sprites[1].dataNibbles.colorCode = TMS_DARK_GREEN;
+  /* setup sprites */
+  for(spriteIndex = 0; spriteIndex < SPRITES_8X8_NUM; spriteIndex++)
+  {
+    /** border is 8x8 **/
+    /** display is 256x192 Y top is 255 (-1). -1 to 191 (191 is in border) */ 
+    sprites[spriteIndex].dataNibbles.verticalPos = rand()%184;
+    
+    /** dispaly is 256x192 X left is 0. 0 to 255 (255 is in border) */
+    sprites[spriteIndex].dataNibbles.horizontalPos = rand()%248;
+    
+    sprites[spriteIndex].dataNibbles.name = (uint8_t)spriteIndex;
+    
+    sprites[spriteIndex].dataNibbles.earlyClockBit = 0;
+    
+    sprites[spriteIndex].dataNibbles.na = 0;
+    
+    sprites[spriteIndex].dataNibbles.colorCode = 15 - (uint8_t)spriteIndex;
+  }
   
   /* write sprites to vram */
   setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
   
   setTMS99XXvramData(&tms99XX, sprites, sizeof(sprites));
+  
+  setTMS99XXvramSpriteTerm(&tms99XX, SPRITES_8X8_NUM);
   
   /* enable screen */
   setTMS99XXblank(&tms99XX, 0);
@@ -212,17 +209,14 @@ void main(void)
     
     __delay_ms(10);
     
-    sprites[0].dataNibbles.verticalPos -= 5;
-    
-    sprites[0].dataNibbles.horizontalPos += 5;
-    
-    sprites[1].dataNibbles.horizontalPos += 1;
-    
-    if(!(sprites[1].dataNibbles.horizontalPos % 16))
+    for(spriteIndex = 0; spriteIndex < SPRITES_8X8_NUM; spriteIndex++)
     {
-      sprites[1].dataNibbles.name++;
+      if(sprites[spriteIndex].dataNibbles.verticalPos == 248)
+      {
+        sprites[spriteIndex].dataNibbles.verticalPos = 192;
+      }
       
-      if(sprites[1].dataNibbles.name == 4) sprites[1].dataNibbles.name = 1;
+      sprites[spriteIndex].dataNibbles.verticalPos -= 1;
     }
     
     setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
@@ -231,6 +225,38 @@ void main(void)
   }
   
   /* test GFX sprite in mag mode */
+  
+  setTMS99XXspriteMagnify(&tms99XX, 1);
+  
+  /* write 2022 Jay Convertino on top line */
+  setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
+  
+  setTMS99XXvramData(&tms99XX, tag, sizeof(tag)); 
+  
+  setTMS99XXvramData(&tms99XX, gfximag, sizeof(gfximag));
+  
+  for(index = 0; index < 1000; index++)
+  {
+    LATE = g_porteBuffer;
+    
+    g_porteBuffer = (unsigned char)(g_porteBuffer == 4 ? 1 : g_porteBuffer << 1);
+    
+    __delay_ms(10);
+    
+    for(spriteIndex = 0; spriteIndex < SPRITES_8X8_NUM; spriteIndex++)
+    {
+      if(sprites[spriteIndex].dataNibbles.verticalPos == 248)
+      {
+        sprites[spriteIndex].dataNibbles.verticalPos = 192;
+      }
+      
+      sprites[spriteIndex].dataNibbles.verticalPos -= 1;
+    }
+    
+    setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
+  
+    setTMS99XXvramData(&tms99XX, sprites, sizeof(sprites));
+  }
   
   /* test GFX large sprite in no mag mode */
   
@@ -246,6 +272,9 @@ void main(void)
   
   /* LAST: TEXT MODE */
   setTMS99XXmode(&tms99XX, TXT_MODE);
+  
+  /* SET TO BLACK */
+  setTMS99XXbackgroundColor(&tms99XX, TMS_BLACK);
   
   /* write to pattern table */
   setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
@@ -271,7 +300,9 @@ void main(void)
   /* write 2022 Jay Convertino on last line (24 (23, offset 0)) */
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR + (40 * 23));
   
-  setTMS99XXvramData(&tms99XX, tag, sizeof(tag)); 
+  setTMS99XXvramData(&tms99XX, tag, sizeof(tag));
+  
+  setTMS99XXvramData(&tms99XX, txtmode, sizeof(txtmode));
   
   /* enable irq */
   /* when irq is enabled, polling will be used */
