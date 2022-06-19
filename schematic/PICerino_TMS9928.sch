@@ -1854,17 +1854,6 @@ Connection ~ 1850 9925
 Wire Wire Line
 	6250 6500 5725 6500
 $Comp
-L Connector_Generic:Conn_01x02 J6
-U 1 1 62D67FC6
-P 10475 7425
-F 0 "J6" H 10555 7417 50  0000 L CNN
-F 1 "Conn_01x02_Y" H 10555 7326 50  0000 L CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 10475 7425 50  0001 C CNN
-F 3 "~" H 10475 7425 50  0001 C CNN
-	1    10475 7425
-	1    0    0    -1  
-$EndComp
-$Comp
 L Device:R R12
 U 1 1 62D69E3B
 P 9725 7425
@@ -1878,12 +1867,12 @@ $EndComp
 $Comp
 L power:VSS #PWR038
 U 1 1 62E712D4
-P 10250 7525
-F 0 "#PWR038" H 10250 7375 50  0001 C CNN
-F 1 "VSS" V 10225 7700 50  0000 C CNN
-F 2 "" H 10250 7525 50  0001 C CNN
-F 3 "" H 10250 7525 50  0001 C CNN
-	1    10250 7525
+P 10525 7425
+F 0 "#PWR038" H 10525 7275 50  0001 C CNN
+F 1 "VSS" V 10500 7600 50  0000 C CNN
+F 2 "" H 10525 7425 50  0001 C CNN
+F 3 "" H 10525 7425 50  0001 C CNN
+	1    10525 7425
 	0    -1   -1   0   
 $EndComp
 $Comp
@@ -1989,8 +1978,6 @@ Wire Wire Line
 Connection ~ 4900 6825
 Wire Wire Line
 	4900 6950 4850 6950
-Wire Wire Line
-	10275 7525 10250 7525
 $Comp
 L Device:CP_Small C25
 U 1 1 63922960
@@ -2003,9 +1990,7 @@ F 3 "~" H 10050 7425 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	9875 7425 9950 7425
-Wire Wire Line
-	10150 7425 10275 7425
+	9875 7425 9900 7425
 $Comp
 L Device:R R10
 U 1 1 63B37F7E
@@ -2313,8 +2298,6 @@ Wire Wire Line
 Connection ~ 5725 7050
 Wire Wire Line
 	7450 7000 7450 7150
-Wire Wire Line
-	7550 7000 7550 7150
 $Comp
 L power:VSS #PWR028
 U 1 1 6324F5BF
@@ -2326,8 +2309,6 @@ F 3 "" H 7650 7075 50  0001 C CNN
 	1    7650 7075
 	0    1    1    0   
 $EndComp
-Wire Wire Line
-	7650 7075 7650 7000
 Wire Wire Line
 	9500 7425 9500 7825
 $Comp
@@ -2344,12 +2325,12 @@ $EndComp
 $Comp
 L power:VSS #PWR06
 U 1 1 6338804C
-P 4075 8175
-F 0 "#PWR06" H 4075 8025 50  0001 C CNN
-F 1 "VSS" V 4075 8350 50  0000 C CNN
-F 2 "" H 4075 8175 50  0001 C CNN
-F 3 "" H 4075 8175 50  0001 C CNN
-	1    4075 8175
+P 3975 8200
+F 0 "#PWR06" H 3975 8050 50  0001 C CNN
+F 1 "VSS" V 3975 8375 50  0000 C CNN
+F 2 "" H 3975 8200 50  0001 C CNN
+F 3 "" H 3975 8200 50  0001 C CNN
+	1    3975 8200
 	0    -1   -1   0   
 $EndComp
 $Comp
@@ -2410,17 +2391,6 @@ Connection ~ 7600 8425
 Wire Wire Line
 	7600 8425 7575 8425
 $Comp
-L Connector_Generic:Conn_01x02 J5
-U 1 1 63500FBA
-P 11300 8775
-F 0 "J5" H 11380 8767 50  0000 L CNN
-F 1 "Conn_01x02_Yr" H 11380 8676 50  0000 L CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 11300 8775 50  0001 C CNN
-F 3 "~" H 11300 8775 50  0001 C CNN
-	1    11300 8775
-	1    0    0    -1  
-$EndComp
-$Comp
 L Device:R R9
 U 1 1 63500FC0
 P 8250 8775
@@ -2434,16 +2404,14 @@ $EndComp
 $Comp
 L power:VSS #PWR032
 U 1 1 63500FC6
-P 8775 8875
-F 0 "#PWR032" H 8775 8725 50  0001 C CNN
-F 1 "VSS" V 8750 9050 50  0000 C CNN
-F 2 "" H 8775 8875 50  0001 C CNN
-F 3 "" H 8775 8875 50  0001 C CNN
-	1    8775 8875
+P 9000 8775
+F 0 "#PWR032" H 9000 8625 50  0001 C CNN
+F 1 "VSS" V 8975 8950 50  0000 C CNN
+F 2 "" H 9000 8775 50  0001 C CNN
+F 3 "" H 9000 8775 50  0001 C CNN
+	1    9000 8775
 	0    -1   -1   0   
 $EndComp
-Wire Wire Line
-	8800 8875 8775 8875
 $Comp
 L Device:CP_Small C24
 U 1 1 63500FCD
@@ -2456,9 +2424,7 @@ F 3 "~" H 8575 8775 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	8400 8775 8475 8775
-Wire Wire Line
-	8675 8775 8800 8775
+	8400 8775 8450 8775
 Wire Wire Line
 	7950 8425 7950 8775
 Wire Wire Line
@@ -2545,17 +2511,6 @@ Wire Wire Line
 	7975 8025 7975 7925
 Connection ~ 7975 8125
 $Comp
-L Connector_Generic:Conn_01x02 J7
-U 1 1 637D8F5D
-P 9000 8775
-F 0 "J7" H 9080 8767 50  0000 L CNN
-F 1 "Conn_01x02_Yb" H 9080 8676 50  0000 L CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 9000 8775 50  0001 C CNN
-F 3 "~" H 9000 8775 50  0001 C CNN
-	1    9000 8775
-	1    0    0    -1  
-$EndComp
-$Comp
 L Device:R R15
 U 1 1 637D8F63
 P 10550 8775
@@ -2569,16 +2524,14 @@ $EndComp
 $Comp
 L power:VSS #PWR043
 U 1 1 637D8F69
-P 11075 8875
-F 0 "#PWR043" H 11075 8725 50  0001 C CNN
-F 1 "VSS" V 11050 9050 50  0000 C CNN
-F 2 "" H 11075 8875 50  0001 C CNN
-F 3 "" H 11075 8875 50  0001 C CNN
-	1    11075 8875
+P 11250 8775
+F 0 "#PWR043" H 11250 8625 50  0001 C CNN
+F 1 "VSS" V 11225 8950 50  0000 C CNN
+F 2 "" H 11250 8775 50  0001 C CNN
+F 3 "" H 11250 8775 50  0001 C CNN
+	1    11250 8775
 	0    -1   -1   0   
 $EndComp
-Wire Wire Line
-	11100 8875 11075 8875
 $Comp
 L Device:CP_Small C28
 U 1 1 637D8F70
@@ -2591,9 +2544,7 @@ F 3 "~" H 10875 8775 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	10700 8775 10775 8775
-Wire Wire Line
-	10975 8775 11100 8775
+	10700 8775 10750 8775
 Wire Wire Line
 	9525 8775 9525 8425
 Wire Wire Line
@@ -2601,16 +2552,6 @@ Wire Wire Line
 Connection ~ 9525 8425
 Wire Wire Line
 	9525 8425 9550 8425
-Wire Wire Line
-	11975 8975 11975 8225
-Wire Wire Line
-	9475 8225 11975 8225
-Wire Wire Line
-	11125 8025 11125 7150
-Wire Wire Line
-	9475 8025 11125 8025
-Wire Wire Line
-	7550 7150 11125 7150
 $Comp
 L Connector:TestPoint TP2
 U 1 1 638CA91D
@@ -2664,15 +2605,8 @@ F 3 "" H 5300 9225 50  0001 C CNN
 	1    5300 9225
 	-1   0    0    1   
 $EndComp
-Connection ~ 4075 8175
-Wire Wire Line
-	4075 8175 4075 8100
 Wire Wire Line
 	5200 8000 6200 8000
-Wire Wire Line
-	4175 8325 4175 8250
-Wire Wire Line
-	4075 8175 4075 8325
 Wire Wire Line
 	4625 7400 6350 7400
 Wire Wire Line
@@ -2685,8 +2619,6 @@ Wire Wire Line
 	4725 8325 4275 8325
 Wire Wire Line
 	4725 7500 6450 7500
-Wire Wire Line
-	6550 8975 11975 8975
 Wire Wire Line
 	6200 8300 6550 8300
 Wire Wire Line
@@ -2709,7 +2641,7 @@ F 3 "~" H 5625 8850 50  0001 C CNN
 $EndComp
 Connection ~ 5625 8700
 Wire Wire Line
-	5625 8700 6450 8700
+	5625 8700 6200 8700
 $Comp
 L power:VSS #PWR0101
 U 1 1 63BFF3BC
@@ -2726,15 +2658,143 @@ Wire Wire Line
 Wire Wire Line
 	4825 8400 5200 8400
 Wire Wire Line
-	4175 8150 4175 8100
-Wire Wire Line
-	4175 8150 4825 8150
-Wire Wire Line
-	4175 8250 4975 8250
-Wire Wire Line
 	4975 7900 5200 7900
 Wire Wire Line
 	4975 7900 4975 8250
+$Comp
+L Connector_Generic:Conn_01x03 J6
+U 1 1 62A9CE58
+P 10725 7425
+F 0 "J6" H 10875 7425 50  0000 R CNN
+F 1 "Conn_01x03_Y" H 11325 7325 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 10725 7425 50  0001 C CNN
+F 3 "~" H 10725 7425 50  0001 C CNN
+	1    10725 7425
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10275 7325 10275 7200
+Wire Wire Line
+	10275 7200 9900 7200
+Wire Wire Line
+	9900 7200 9900 7425
+Connection ~ 9900 7425
+Wire Wire Line
+	9900 7425 9950 7425
+$Comp
+L Connector_Generic:Conn_01x03 J7
+U 1 1 62AD1BC1
+P 11450 8775
+F 0 "J7" H 11600 8825 50  0000 R CNN
+F 1 "Conn_01x03_Yr" H 12075 8675 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 11450 8775 50  0001 C CNN
+F 3 "~" H 11450 8775 50  0001 C CNN
+	1    11450 8775
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11050 8675 11050 8525
+Wire Wire Line
+	11050 8525 10750 8525
+Wire Wire Line
+	10750 8525 10750 8775
+Connection ~ 10750 8775
+Wire Wire Line
+	10750 8775 10775 8775
+$Comp
+L Connector_Generic:Conn_01x03 J5
+U 1 1 62B07ED5
+P 9200 8775
+F 0 "J5" H 9350 8825 50  0000 R CNN
+F 1 "Conn_01x03_Yb" H 9850 8675 50  0000 R CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 9200 8775 50  0001 C CNN
+F 3 "~" H 9200 8775 50  0001 C CNN
+	1    9200 8775
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8800 8675 8800 8550
+Wire Wire Line
+	8800 8550 8450 8550
+Wire Wire Line
+	8450 8550 8450 8775
+Connection ~ 8450 8775
+Wire Wire Line
+	8450 8775 8475 8775
+$Comp
+L Device:R R16
+U 1 1 62AB4DAE
+P 6200 8850
+F 0 "R16" V 6300 8775 50  0000 L CNN
+F 1 "1M" V 6100 8800 50  0000 L CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 6130 8850 50  0001 C CNN
+F 3 "~" H 6200 8850 50  0001 C CNN
+	1    6200 8850
+	-1   0    0    1   
+$EndComp
+Connection ~ 6200 8700
+Wire Wire Line
+	6200 8700 6450 8700
+$Comp
+L power:VSS #PWR0102
+U 1 1 62AB52D0
+P 6200 9000
+F 0 "#PWR0102" H 6200 8850 50  0001 C CNN
+F 1 "VSS" V 6275 9100 50  0000 C CNN
+F 2 "" H 6200 9000 50  0001 C CNN
+F 3 "" H 6200 9000 50  0001 C CNN
+	1    6200 9000
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	4825 8150 4175 8150
+Wire Wire Line
+	4175 8150 4175 8100
+Wire Wire Line
+	4975 8250 4175 8250
+Wire Wire Line
+	4175 8250 4175 8325
+Wire Wire Line
+	4075 8325 4075 8200
+Wire Wire Line
+	3975 8200 4075 8200
+Connection ~ 4075 8200
+Wire Wire Line
+	4075 8200 4075 8100
+Wire Wire Line
+	7550 7150 7550 7000
+Wire Wire Line
+	7650 7075 7650 7000
+Wire Wire Line
+	9000 8675 8800 8675
+Wire Wire Line
+	8675 8775 8675 8875
+Wire Wire Line
+	8675 8875 9000 8875
+Wire Wire Line
+	12125 8975 12125 8225
+Wire Wire Line
+	9475 8225 12125 8225
+Wire Wire Line
+	6550 8975 12125 8975
+Wire Wire Line
+	11050 8675 11250 8675
+Wire Wire Line
+	11250 8875 10975 8875
+Wire Wire Line
+	10975 8875 10975 8775
+Wire Wire Line
+	10525 7525 10150 7525
+Wire Wire Line
+	10150 7525 10150 7425
+Wire Wire Line
+	10275 7325 10525 7325
+Wire Wire Line
+	11375 8025 11375 7150
+Wire Wire Line
+	9475 8025 11375 8025
+Wire Wire Line
+	7550 7150 11375 7150
 Wire Bus Line
 	13700 2350 13700 3900
 Wire Bus Line
