@@ -90,9 +90,6 @@ void main(void)
 
   OSCCON2bits.PLLEN = 1;
 
-  /* PORT E SETUP */
-  INTCON2bits.nRBPU = 1;
-
   /* disable analog inputs */
   ANSELA = 0;
   ANSELB = 0;
@@ -100,8 +97,9 @@ void main(void)
   ANSELD = 0;
   ANSELE = 0;
   
-  /* disable pull ups */
-  WPUB = 0;
+  /* ensable pull ups */
+  INTCON2bits.nRBPU = 0;
+  WPUB = 0xFF;
   IOCB = 0;
 
   /* Port E set all to output */
@@ -109,7 +107,7 @@ void main(void)
 
   LATE = 0;
 
-  g_porteBuffer = 1;
+  g_porteBuffer = 4;
 
   /* wait for chip to be ready */
   __delay_ms(100);
