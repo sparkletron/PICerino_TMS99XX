@@ -2821,6 +2821,10 @@ Wire Wire Line
 Connection ~ 5300 9025
 Wire Wire Line
 	5625 8800 5625 8700
+Wire Wire Line
+	4300 8700 4675 8700
+Wire Wire Line
+	4450 9025 5300 9025
 Wire Bus Line
 	13700 2350 13700 3900
 Wire Bus Line
@@ -2861,8 +2865,6 @@ Wire Bus Line
 	5000 3550 5000 4250
 Wire Bus Line
 	3500 3550 3500 4250
-Wire Wire Line
-	4300 8700 4675 8700
-Wire Wire Line
-	4450 9025 5300 9025
+Text Notes 15400 1575 0    50   ~ 0
+RAM DEBUG PORTS
 $EndSCHEMATC
