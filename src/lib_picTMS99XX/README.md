@@ -32,8 +32,18 @@ license: MIT
   
 ### Example Code
 ```c
+#include <xc.h>
+#include <stdint.h>
+#include <tms99XX.h>
+#include <tms99XXascii.h>
+
 void main(void) 
 {
+  int index = 0;
+
+  /* contains ti chip object */
+  struct s_tms99XX tms99XX;
+
   /* OSCCON SETUP */
   OSCCONbits.IRCF = 0x7;
   OSCCONbits.OSTS = 0;
@@ -51,10 +61,38 @@ void main(void)
   ANSELE = 0;
 
   /* wait for chip to be ready */
-  __delay_ms(10);
+  __delay_ms(100);
 
+  /* setup ports in struct for proper i/o */
+  initTMS99XXport(&tms99XX, &TRISB, &TRISD, &TRISC, 3, 2, 0, 1, 6);
+
+  /* setup tms9928 chip and finish setting up struct */
+  initTMS99XX(&tms99XX, GFXI_MODE, TMS_TRANSPARENT, &LATB, &PORTB, &LATD, &PORTC);
+
+  /* SYSTEM TESTS */
+
+  /* check all vram */
+  if(!checkTMS99XXvram(&tms99XX))
+  {
+    __delay_ms(2000);
+    return;
+  }
+
+  /* clear all ti vdp memory */
+  clearTMS99XXvramData(&tms99XX);
+
+  /* enable screen */
+  setTMS99XXblank(&tms99XX, 0);
   
-  /* play this lovely tune forever */
-  for(;;);
+  /* Change the background color... forever */
+  for(;;)
+  {
+    setTMS99XXbackgroundColor(&tms99XX, (unsigned char)index);
+
+    __delay_ms(1000);
+
+    /** wrap around at 16... values will be 0 to 15 **/
+    index = (index + 1) % 16;
+  }
 }
 ```
