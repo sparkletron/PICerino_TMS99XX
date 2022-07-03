@@ -51,8 +51,10 @@ void main(void)
 
   OSCCON2bits.PLLEN = 1;
 
-  /* PORT E SETUP */
-  INTCON2bits.nRBPU = 1;
+  /* enable pull ups */
+  INTCON2bits.nRBPU = 0;
+  WPUB = 0xFF;
+  IOCB = 0;
 
   /* disable analog inputs */
   ANSELA = 0;
