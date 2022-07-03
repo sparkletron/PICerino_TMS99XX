@@ -1,8 +1,8 @@
 /*******************************************************************************
- * @file      picTEST.c
+ * @file      videoTEST.c
  * @author    Jay Convertino
  * @date      2022.03.01
- * @brief     Test PICerino platform
+ * @brief     Test PICerino TMS99XX card.
  ******************************************************************************/
 
 #include <xc.h>
@@ -31,13 +31,15 @@
 #pragma config PBADEN   = OFF
 #pragma config MCLRE    = OFF
 
-//needed since chip is read-modify write only, and read in the same line doesn't work
+/* used since chip is read-modify write only */
 unsigned char g_porteBuffer = 0;
 
 void main(void) 
 {
   /* happy fun time variables */
   int       index = 0;
+  int       row = 0;
+  int       col = 0;
   int       spriteIndex = 0;
   uint16_t  freq = 0;
   uint8_t   attn = 0;
@@ -70,17 +72,35 @@ void main(void)
   
   /* sprite 1 */
   union u_tms99XX_spriteAttributeTable sprites[SPRITES_8X8_NUM] = {0};
+
+  /* colors for bitmap bars */
+  union u_tms99XX_BMPpixelBlock tmsWhitePixelBlock = {.dataNibbles = {TMS_WHITE, TMS_WHITE, TMS_WHITE, TMS_WHITE}};
+
+  union u_tms99XX_BMPpixelBlock tmsYellowPixelBlock = { .dataNibbles = {TMS_LIGHT_YELLOW, TMS_LIGHT_YELLOW, TMS_LIGHT_YELLOW, TMS_LIGHT_YELLOW}};
+
+  union u_tms99XX_BMPpixelBlock tmsCyanPixelBlock = { .dataNibbles = {TMS_CYAN, TMS_CYAN, TMS_CYAN, TMS_CYAN}};
+
+  union u_tms99XX_BMPpixelBlock tmsGreenPixelBlock = { .dataNibbles = {TMS_LIGHT_GREEN, TMS_LIGHT_GREEN, TMS_LIGHT_GREEN, TMS_LIGHT_GREEN}};
+
+  union u_tms99XX_BMPpixelBlock tmsMagentaPixelBlock = { .dataNibbles = {TMS_MAGENTA, TMS_MAGENTA, TMS_MAGENTA, TMS_MAGENTA}};
+
+  union u_tms99XX_BMPpixelBlock tmsRedPixelBlock = { .dataNibbles = {TMS_MEDIUM_RED, TMS_MEDIUM_RED, TMS_MEDIUM_RED, TMS_MEDIUM_RED}};
+
+  union u_tms99XX_BMPpixelBlock tmsBluePixelBlock = { .dataNibbles = {TMS_DARK_BLUE, TMS_DARK_BLUE, TMS_DARK_BLUE, TMS_DARK_BLUE}};
+
+  union u_tms99XX_BMPpixelBlock tmsBlackPixelBlock = { .dataNibbles = {TMS_BLACK, TMS_BLACK, TMS_BLACK, TMS_BLACK}};
   
-  /* create struct to store ascii name table in order, skipping first 32 null patterns */
-  uint8_t nameTable[1 + (sizeof(c_tms99XX_ascii) - (32 * 8))/8] = {0};
+  /* create struct to store ascii name table in order, removing first 32 null patterns */
+  uint8_t nameTable[1 + (sizeof(c_tms99XX_ascii)/8) - 32] = {0};
 
   /* buffer array to scoll a text line */
   uint8_t scrollArray[40] = {0};
   
   /* create nametable to display all ascii characters */
-  for(index = 32; index < sizeof(nameTable)+32; index++)
+  for(index = 0; index < sizeof(nameTable); index++)
   {
-    nameTable[index-32] = (unsigned char)index;
+    /** offset to skip first 32 nulls **/
+    nameTable[index] = (unsigned char)index + 32;
   }
   
   /* OSCCON SETUP */
@@ -97,7 +117,7 @@ void main(void)
   ANSELD = 0;
   ANSELE = 0;
   
-  /* ensable pull ups */
+  /* enable pull ups */
   INTCON2bits.nRBPU = 0;
   WPUB = 0xFF;
   IOCB = 0;
@@ -176,7 +196,7 @@ void main(void)
     /** display is 256x192 Y top is 255 (-1). -1 to 191 (191 is in border) */ 
     sprites[spriteIndex].dataNibbles.verticalPos = rand()%184;
     
-    /** dispaly is 256x192 X left is 0. 0 to 255 (255 is in border) */
+    /** display is 256x192 X left is 0. 0 to 255 (255 is in border) */
     sprites[spriteIndex].dataNibbles.horizontalPos = rand()%248;
     
     sprites[spriteIndex].dataNibbles.name = (uint8_t)spriteIndex;
@@ -223,7 +243,6 @@ void main(void)
   }
   
   /* test GFX sprite in mag mode */
-  
   setTMS99XXspriteMagnify(&tms99XX, 1);
   
   /* write 2022 Jay Convertino on top line */
@@ -262,12 +281,93 @@ void main(void)
   
   LATE = 0;
   
+  /* SET TO BLACK */
+  setTMS99XXbackgroundColor(&tms99XX, TMS_BLACK);
+
   /* disable screen */
   setTMS99XXblank(&tms99XX, 1);
   
   /* clear all ti vdp memory */
   clearTMS99XXvramData(&tms99XX);
-  
+
+  /* test multicolor bitmap mode */
+  setTMS99XXmode(&tms99XX, BMP_MODE);
+
+  /* write to pattern table */
+  setTMS99XXvramWriteAddr(&tms99XX, PATTERN_TABLE_ADDR);
+
+  /*
+   * write white pixel block 4 times (8 bytes total, each block contains 2 bytes).
+   * then write next, and the next and so on every 4... so for 8 colors thats 4*8 total
+   * for 32 times. Every 4++ changes block to write.
+   */
+  for(index = 0; index < 32; index++)
+  {
+    if(index < 4)
+    {
+      setTMS99XXvramData(&tms99XX, &tmsWhitePixelBlock, sizeof(tmsWhitePixelBlock));
+    }
+    else if(index < 8)
+    {
+      setTMS99XXvramData(&tms99XX, &tmsYellowPixelBlock, sizeof(tmsYellowPixelBlock));
+    }
+    else if(index < 12)
+    {
+      setTMS99XXvramData(&tms99XX, &tmsCyanPixelBlock, sizeof(tmsCyanPixelBlock));
+    }
+    else if(index < 16)
+    {
+      setTMS99XXvramData(&tms99XX, &tmsGreenPixelBlock, sizeof(tmsGreenPixelBlock));
+    }
+    else if(index < 20)
+    {
+      setTMS99XXvramData(&tms99XX, &tmsMagentaPixelBlock, sizeof(tmsMagentaPixelBlock));
+    }
+    else if(index < 24)
+    {
+      setTMS99XXvramData(&tms99XX, &tmsRedPixelBlock, sizeof(tmsRedPixelBlock));
+    }
+    else if(index < 28)
+    {
+      setTMS99XXvramData(&tms99XX, &tmsBluePixelBlock, sizeof(tmsBluePixelBlock));
+    }
+    else
+    {
+      setTMS99XXvramData(&tms99XX, &tmsBlackPixelBlock, sizeof(tmsBlackPixelBlock));
+    }
+  }
+
+  /* write to name table */
+  setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
+  /*
+   * populate name table... Row 0 is 0 for 4, then 1 for 4 till reaching 32.
+   * Each row repeats this. There are 24 rows.
+   */
+  for(row = 0; row < 24; row++)
+  {
+    for(col = 0; col < 8; col++)
+    {
+      setTMS99XXvramConstData(&tms99XX, (uint8_t)col, 4);
+    }
+  }
+
+  /* enable screen */
+  setTMS99XXblank(&tms99XX, 0);
+
+  /* test all 16 background colors */
+  for(index = 0; index <= TMS_WHITE; index++)
+  {
+    setTMS99XXbackgroundColor(&tms99XX, (unsigned char)index);
+
+    __delay_ms(1000);
+  }
+
+  /* dinable screen */
+  setTMS99XXblank(&tms99XX, 1);
+
+  /* clear all ti vdp memory */
+  clearTMS99XXvramData(&tms99XX);
+
   /* LAST: TEXT MODE */
   setTMS99XXmode(&tms99XX, TXT_MODE);
   
@@ -288,7 +388,6 @@ void main(void)
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
   
   setTMS99XXvramData(&tms99XX, nameTable, sizeof(nameTable));
-  
   
   /* write hello world on line 12 */
   setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR + (40 * 11));

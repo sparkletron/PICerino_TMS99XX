@@ -146,98 +146,67 @@ struct s_tms99XX
 union u_tms99XX_patternTable8x8
 {
   /**
-  * @struct u_tms99XX_patternTable8x8::s_pDataNibbles
-  * contains color fields for bitmap mode. see page 2-22 of TMS9918 data manual.
-  */
-  __pack struct s_pDataNibbles
-  {
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorA
-    * color
-    */
-    uint8_t colorA:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorB
-    * color
-    */
-    uint8_t colorB:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorC
-    * color
-    */
-    uint8_t colorC:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorD
-    * color
-    */
-    uint8_t colorD:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorE
-    * color
-    */
-    uint8_t colorE:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorF
-    * color
-    */
-    uint8_t colorF:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorG
-    * color
-    */
-    uint8_t colorG:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorH
-    * color
-    */
-    uint8_t colorH:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorI
-    * color
-    */
-    uint8_t colorI:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorJ
-    * color
-    */
-    uint8_t colorJ:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorK
-    * color
-    */
-    uint8_t colorK:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorL
-    * color
-    */
-    uint8_t colorL:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorM
-    * color
-    */
-    uint8_t colorM:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorN
-    * color
-    */
-    uint8_t colorN:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorO
-    * color
-    */
-    uint8_t colorO:4;
-    /**
-    * @var  u_tms99XX_patternTable8x8::s_pDataNibbles::colorP
-    * color
-    */
-    uint8_t colorP:4;
-  } dataNibbles;
-  
-  /**
    * @var u_tms99XX_patternTable8x8::data
    * array of 8 bytes for a 8x8 matrix.
    */
   uint8_t data[8];
+};
+
+/**
+ * @union u_tms99XX_BMPpixelBlock
+ * @brief Struct for containing a single multicolor mode pixel block
+ */
+union u_tms99XX_BMPpixelBlock
+{
+  /**
+  * @struct u_tms99XX_BMPpixelBlock::s_pDataNibbles
+  * contains color fields for bitmap mode. see page 8-13 of TI-VDP-Programmers_guide.pdf
+  * |--------|--------|
+  * |color A |color B |
+  * |--------|--------|
+  * |color C |color D |
+  * |--------|--------|
+  *
+  * The above is a mapping of the pixel pattern on screen. The resolution is
+  * 64x48 pixels. Each row has rules for indexing from the name table into the
+  * pattern table. Rows 0,4,8,12,16,20 index into the first pixel block at
+  * offsets of 8 bytes. A name table value of 0, will be pattern pixel block 0.
+  * A name table value of 1 will actually map to byte offset of 8, the next chunk
+  * of pixels. Pixels are chunked in 8 byte sections. Since the rows name lookup
+  * will loop after 4 rows. Meaning Row 1,5,9,13,17,21 name table will resolve to
+  * the same value in the pattern table. Same for Row 0,4,8,12,16,20. To be clear
+  * row 0, name table value 0 gets pattern 0. Row 4, name table value 0 gets
+  * pattern 0 as well.
+  */
+  __pack struct s_pDataNibbles
+  {
+    /**
+    * @var  u_tms99XX_BMPpixelBlock::s_pDataNibbles::colorA
+    * color lower nibble
+    */
+    uint8_t colorB:4;
+    /**
+    * @var  u_tms99XX_BMPpixelBlock::s_pDataNibbles::colorB
+    * color upper nibble
+    */
+    uint8_t colorA:4;
+    /**
+    * @var  u_tms99XX_BMPpixelBlock::s_pDataNibbles::colorC
+    * color lower nibble
+    */
+    uint8_t colorD:4;
+    /**
+    * @var  u_tms99XX_BMPpixelBlock::s_pDataNibbles::colorD
+    * color upper nibble
+    */
+    uint8_t colorC:4;
+  } dataNibbles;
+  
+  /**
+   * @var u_tms99XX_BMPpixelBlock::data
+   * array of 2 bytes for a 2x2 4 pixel map.
+   */
+  uint8_t data[2];
 };
 
 /**
@@ -266,15 +235,15 @@ union u_tms99XX_colorTable
   __pack struct s_cDataNibbles
   {
     /**
-    * @var u_tms99XX_colorTable::s_cDataNibbles::color1
-    * top nibble, color for 1
-    */
-    uint8_t color1:4;
-    /**
     * @var u_tms99XX_colorTable::s_cDataNibbles::color2
     * bottom nibble, color for 0
     */
     uint8_t color2:4;
+    /**
+    * @var u_tms99XX_colorTable::s_cDataNibbles::color1
+    * top nibble, color for 1
+    */
+    uint8_t color1:4;
   } dataNibbles;
   
   /**
