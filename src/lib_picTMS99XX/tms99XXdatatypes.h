@@ -274,9 +274,13 @@ struct s_tms99XX_spritePatternTable16x16
 {
   /**
   * @var s_tms99XX_spritePatternTable16x16::data
-  * contains 16x16 matrix of sprite pattern data
+  * contains 16x16 matrix of sprite pattern data.
+  * First 8, upper left.
+  * Second 8, lower left.
+  * Third 8, upper right.
+  * Last 8, lower right.
   */
-  uint16_t data[16];
+  uint8_t data[32];
 };
 
 /**

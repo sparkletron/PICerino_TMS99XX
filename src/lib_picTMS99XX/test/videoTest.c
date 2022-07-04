@@ -10,7 +10,8 @@
 #include <tms99XX.h>
 #include <tms99XXascii.h>
 
-#define SPRITES_8X8_NUM 5
+#define SPRITES_8X8_NUM   5
+#define SPRITES_16X16_NUM 4
 
 /* configuration bits */
 #pragma config PLLSEL   = PLL3X
@@ -57,10 +58,14 @@ void main(void)
   char gfxi[] = "GFX I";
   
   char gfximag[] = "GFX I MAG";
+
+  char gfxlarge[] = "GFX I LARGE";
+
+  char gfxlargeMag[] = "GFX I L MAG";
   
   char txtmode[] = "TXT";
   
-  /* GFX 8x8 sprites */
+  /* 8x8 sprites */
   struct s_tms99XX_spritePatternTable8x8 tms8x8sprites[] =
   {
     {{0x99, 0x66, 0x66, 0x99, 0x99, 0x66, 0x66, 0x99}}, //ship 1
@@ -69,8 +74,24 @@ void main(void)
     {{0x24, 0x24, 0x24, 0x3C, 0x18, 0xFF, 0x66, 0xFF}}, //ship 4
     {{0x81, 0x42, 0x3C, 0x18, 0x3C, 0x66, 0xFF, 0xFF}}  //ship 5
   };
+
+  /* 16x16 sprites */
+  struct s_tms99XX_spritePatternTable16x16 tms16x16Sprites[] =
+  {
+    {{0x01, 0x03, 0x23, 0x73, 0x3B, 0x19, 0x0C, 0x00, 0x3C, 0xF8, 0x63, 0x06, 0x0C, 0x0C, 0x18, 0x00,
+      0x00, 0x00, 0x0C, 0x38, 0x70, 0x40, 0x5F, 0x38, 0x20, 0x30, 0x9C, 0xCE, 0xC2, 0xE0, 0x60, 0x20}}, // dark pedals
+    {{0x00, 0x08, 0x0C, 0x0C, 0x04, 0x06, 0xF2, 0x3C, 0x00, 0x06, 0x1C, 0x19, 0x33, 0x23, 0x03, 0x01,
+      0x40, 0x60, 0x60, 0xC2, 0x8E, 0xBC, 0x20, 0x00, 0x1F, 0x4E, 0x60, 0x30, 0x18, 0x1C, 0x08, 0x00}}, // light pedals
+    {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}, // center
+    {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x40, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}  // center ring
+  };
   
-  /* sprite 1 */
+  /* sprites 16x16 */
+  union u_tms99XX_spriteAttributeTable largeSprites[SPRITES_16X16_NUM] = {0};
+
+  /* sprites 8x8 */
   union u_tms99XX_spriteAttributeTable sprites[SPRITES_8X8_NUM] = {0};
 
   /* colors for bitmap bars */
@@ -179,6 +200,9 @@ void main(void)
   setTMS99XXvramData(&tms99XX, tag, sizeof(tag)); 
   
   setTMS99XXvramData(&tms99XX, gfxi, sizeof(gfxi));
+
+  /* set sprite size to 8x8 */
+  setTMS99XXspriteSize(&tms99XX, 0);
   
   /* set colors for all patterns */
   setTMS99XXvramWriteAddr(&tms99XX, COLOR_TABLE_ADDR);
@@ -208,7 +232,7 @@ void main(void)
     sprites[spriteIndex].dataNibbles.colorCode = 15 - (uint8_t)spriteIndex;
   }
   
-  /* write sprites to vram */
+  /* write sprites attributes to vram */
   setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
   
   setTMS99XXvramData(&tms99XX, sprites, sizeof(sprites));
@@ -242,7 +266,8 @@ void main(void)
     setTMS99XXvramData(&tms99XX, sprites, sizeof(sprites));
   }
   
-  /* test GFX sprite in mag mode */
+  /* SECOND: GFX sprite in mag mode */
+
   setTMS99XXspriteMagnify(&tms99XX, 1);
   
   /* write 2022 Jay Convertino on top line */
@@ -275,17 +300,141 @@ void main(void)
     setTMS99XXvramData(&tms99XX, sprites, sizeof(sprites));
   }
   
-  /* test GFX large sprite in no mag mode */
+  /* THIRD: GFX I large sprite in no mag mode */
+
+  /* disable screen */
+  setTMS99XXblank(&tms99XX, 1);
+
+  /* disable magnify */
+  setTMS99XXspriteMagnify(&tms99XX, 0);
+
+  /* write 2022 Jay Convertino on top line */
+  setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
+
+  setTMS99XXvramData(&tms99XX, tag, sizeof(tag));
+
+  setTMS99XXvramData(&tms99XX, gfxlarge, sizeof(gfxlarge));
+
+  /* set sprite size to 16x16 */
+  setTMS99XXspriteSize(&tms99XX, 1);
+
+  /* set colors for all patterns */
+  setTMS99XXvramWriteAddr(&tms99XX, COLOR_TABLE_ADDR);
+
+  setTMS99XXvramConstData(&tms99XX, (TMS_MEDIUM_GREEN << 4 | TMS_BLACK), 32);
+
+  /* SET TO GREEN */
+  setTMS99XXbackgroundColor(&tms99XX, TMS_MEDIUM_GREEN);
+
+  setTMS99XXvramWriteAddr(&tms99XX, SPRITE_PATTERN_TABLE_ADDR);
+
+  setTMS99XXvramData(&tms99XX, tms16x16Sprites, sizeof(tms16x16Sprites));
+
+  /* setup largeSprites */
+  for(spriteIndex = 0; spriteIndex < SPRITES_16X16_NUM; spriteIndex++)
+  {
+    /** border is 8x8 **/
+    /** display is 256x192 Y top is 255 (-1). -1 to 191 (191 is in border) **/
+    largeSprites[spriteIndex].dataNibbles.verticalPos = 100;
+
+    /** display is 256x192 X left is 0. 0 to 255 (255 is in border) **/
+    largeSprites[spriteIndex].dataNibbles.horizontalPos = 128;
+
+    /** sprites are offset by the number of chunks the large sprite takes up **/
+    largeSprites[spriteIndex].dataNibbles.name = (uint8_t)spriteIndex * 4;
+
+    largeSprites[spriteIndex].dataNibbles.earlyClockBit = 0;
+
+    largeSprites[spriteIndex].dataNibbles.na = 0;
+
+    switch(spriteIndex)
+    {
+      case 0:
+        largeSprites[spriteIndex].dataNibbles.colorCode = TMS_DARK_BLUE;
+        break;
+      case 1:
+        largeSprites[spriteIndex].dataNibbles.colorCode = TMS_CYAN;
+        break;
+      case 2:
+        largeSprites[spriteIndex].dataNibbles.colorCode = TMS_LIGHT_YELLOW;
+        break;
+      case 3:
+        largeSprites[spriteIndex].dataNibbles.colorCode = TMS_DARK_YELLOW;
+        break;
+    }
+
+  }
+
+  /* write sprites attributes to vram */
+  setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
+
+  setTMS99XXvramData(&tms99XX, largeSprites, sizeof(largeSprites));
+
+  setTMS99XXvramSpriteTerm(&tms99XX, SPRITES_16X16_NUM);
+
+  /* enable screen */
+  setTMS99XXblank(&tms99XX, 0);
+
+  for(index = 0; index < 1000; index++)
+  {
+    LATE = g_porteBuffer;
+
+    g_porteBuffer = (unsigned char)(g_porteBuffer == 4 ? 1 : g_porteBuffer << 1);
+
+    __delay_ms(10);
+
+    for(spriteIndex = 0; spriteIndex < SPRITES_16X16_NUM; spriteIndex++)
+    {
+      largeSprites[spriteIndex].dataNibbles.horizontalPos += 1;
+    }
+
+    setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
+
+    setTMS99XXvramData(&tms99XX, largeSprites, sizeof(largeSprites));
+  }
+
+  /* FOURTH: GFX I large sprite in mag mode */
+
+  /* write 2022 Jay Convertino on top line */
+  setTMS99XXvramWriteAddr(&tms99XX, NAME_TABLE_ADDR);
+
+  setTMS99XXvramData(&tms99XX, tag, sizeof(tag));
+
+  setTMS99XXvramData(&tms99XX, gfxlargeMag, sizeof(gfxlargeMag));
+
+  /* test GFX sprite in mag mode */
+  setTMS99XXspriteMagnify(&tms99XX, 1);
   
-  /* test GFX large sprite in mag mode */
-  
+    for(index = 0; index < 1000; index++)
+  {
+    LATE = g_porteBuffer;
+
+    g_porteBuffer = (unsigned char)(g_porteBuffer == 4 ? 1 : g_porteBuffer << 1);
+
+    __delay_ms(10);
+
+    for(spriteIndex = 0; spriteIndex < SPRITES_16X16_NUM; spriteIndex++)
+    {
+      largeSprites[spriteIndex].dataNibbles.horizontalPos -= 1;
+    }
+
+    setTMS99XXvramWriteAddr(&tms99XX, SPRITE_ATTRIBUTE_TABLE_ADDR);
+
+    setTMS99XXvramData(&tms99XX, largeSprites, sizeof(largeSprites));
+  }
+
   LATE = 0;
   
+  /* FIFTH: multicolor bitmap mode */
+
   /* SET TO BLACK */
   setTMS99XXbackgroundColor(&tms99XX, TMS_BLACK);
 
   /* disable screen */
   setTMS99XXblank(&tms99XX, 1);
+
+  /* disable mag mode */
+  setTMS99XXspriteMagnify(&tms99XX, 0);
   
   /* clear all ti vdp memory */
   clearTMS99XXvramData(&tms99XX);
@@ -362,13 +511,14 @@ void main(void)
     __delay_ms(1000);
   }
 
-  /* dinable screen */
+  /* disable screen */
   setTMS99XXblank(&tms99XX, 1);
 
   /* clear all ti vdp memory */
   clearTMS99XXvramData(&tms99XX);
 
   /* LAST: TEXT MODE */
+
   setTMS99XXmode(&tms99XX, TXT_MODE);
   
   /* SET TO BLACK */
@@ -411,6 +561,7 @@ void main(void)
   
   __delay_ms(1000);
   
+  /* scroll hello world text forever */
   for(;;)
   {
     LATE = g_porteBuffer;
