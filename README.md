@@ -6,7 +6,7 @@ author: Jay Convertino
 
 date: 2022.04.23  
 
-license: MIT (software), None (hardware)  
+license: MIT (software/Hardware)
 
 ## Release Versions
 ### Current

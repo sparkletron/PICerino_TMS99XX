@@ -4,6 +4,13 @@
 
   (paper "B")
 
+  (title_block
+    (title "TMS99XX")
+    (company "sparkletron")
+    (comment 1 "Jay Converitno")
+    (comment 2 "MIT License")
+  )
+
   (lib_symbols
     (symbol "AD813ANZ:AD813ANZ" (pin_names (offset 0.762)) (in_bom yes) (on_board yes)
       (property "Reference" "IC" (id 0) (at 34.29 7.62 0)
