@@ -1,8 +1,0 @@
-(sym_lib_table
-  (lib (name OpenDrive-Genesis)(type Legacy)(uri ${KIPRJMOD}/lib/GENESIS_EDGE/OpenDrive-Genesis.lib)(options "")(descr ""))
-  (lib (name VINTAGE_PC_VIDEO)(type Legacy)(uri ${KIPRJMOD}/lib/VINTAGE_PC_VIDEO/VINTAGE_PC_VIDEO.lib)(options "")(descr ""))
-  (lib (name Picerino)(type Legacy)(uri ${KIPRJMOD}/lib/PICerino/Picerino.lib)(options "")(descr ""))
-  (lib (name ADG453BNZ)(type Legacy)(uri ${KIPRJMOD}/lib/ADG453BNZ/ADG453BNZ.lib)(options "")(descr ""))
-  (lib (name PICerino_TMS9928-rescue)(type Legacy)(uri ${KIPRJMOD}/PICerino_TMS9928-rescue.lib)(options "")(descr ""))
-  (lib (name AD813ANZ)(type Legacy)(uri ${KIPRJMOD}/lib/AD813ANZ/AD813ANZ.lib)(options "")(descr ""))
-)
