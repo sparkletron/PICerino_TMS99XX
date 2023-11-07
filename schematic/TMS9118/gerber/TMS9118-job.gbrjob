@@ -1,60 +1,97 @@
 {
-  "Header":
-  {
-    "GenerationSoftware":
-    {
-      "Vendor":      "KiCad",
+  "Header": {
+    "GenerationSoftware": {
+      "Vendor": "KiCad",
       "Application": "Pcbnew",
-      "Version":     "5.1.12-84ad8e8a86~92~ubuntu20.04.1"
+      "Version": "7.0.7-7.0.7~ubuntu22.04.1"
     },
-    "CreationDate":  "2022-06-23T18:15:19-04:00"
+    "CreationDate": "2023-09-01T08:12:55-04:00"
   },
-  "GeneralSpecs":
-  {
-    "ProjectId":
-    {
-      "Name": "PICerino_TMS9928",
-      "GUID": "50494365-7269-46e6-9f5f-544d53393932",
+  "GeneralSpecs": {
+    "ProjectId": {
+      "Name": "TMS9118",
+      "GUID": "544d5339-3131-4382-9e6b-696361645f70",
       "Revision": "rev?"
     },
-    "Size":
-    {
-      "X": 105.334,
-      "Y": 121.437
+    "Size": {
+      "X": 87.4268,
+      "Y": 74.5744
     },
     "LayerNumber": 2,
-    "BoardThickness":  1.600
+    "BoardThickness": 1.6,
+    "Finish": "None"
   },
-  "DesignRules":
-  [
+  "DesignRules": [
     {
       "Layers": "Outer",
-      "PadToPad":  0.305,
-      "PadToTrack":  0.305,
-      "TrackToTrack":  0.305,
-      "MinLineWidth":  0.279,
-      "TrackToRegion":  0.305,
-      "RegionToRegion":  0.305
+      "PadToPad": 0.25,
+      "PadToTrack": 0.25,
+      "TrackToTrack": 0.3048,
+      "MinLineWidth": 0.3048,
+      "TrackToRegion": 0.381,
+      "RegionToRegion": 0.381
     }
   ],
-  "FilesAttributes":
-  [
+  "FilesAttributes": [
     {
-      "Path":  "PICerino_TMS9928-B_Cu.gbr",
-      "FileFunction":  "Copper,L2,Bot",
-      "FilePolarity":  "Positive"
+      "Path": "TMS9118-F_Cu.gbr",
+      "FileFunction": "Copper,L1,Top",
+      "FilePolarity": "Positive"
     },
     {
-      "Path":  "PICerino_TMS9928-Edge_Cuts.gbr",
-      "FileFunction":  "Profile",
-      "FilePolarity":  "Positive"
+      "Path": "TMS9118-B_Cu.gbr",
+      "FileFunction": "Copper,L2,Bot",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "TMS9118-Edge_Cuts_Mill.gbr",
+      "FileFunction": "Other,User",
+      "FilePolarity": "Positive"
     }
   ],
-  "MaterialStackup":
-  [
+  "MaterialStackup": [
     {
-      "Type":  "Copper",
-      "Notes":  "Layer B.Cu"
+      "Type": "Legend",
+      "Name": "Top Silk Screen"
+    },
+    {
+      "Type": "SolderPaste",
+      "Name": "Top Solder Paste"
+    },
+    {
+      "Type": "SolderMask",
+      "Thickness": 0.01,
+      "Name": "Top Solder Mask"
+    },
+    {
+      "Type": "Copper",
+      "Thickness": 0.035,
+      "Name": "F.Cu"
+    },
+    {
+      "Type": "Dielectric",
+      "Thickness": 1.51,
+      "Material": "FR4",
+      "Name": "F.Cu/B.Cu",
+      "Notes": "Type: dielectric layer 1 (from F.Cu to B.Cu)"
+    },
+    {
+      "Type": "Copper",
+      "Thickness": 0.035,
+      "Name": "B.Cu"
+    },
+    {
+      "Type": "SolderMask",
+      "Thickness": 0.01,
+      "Name": "Bottom Solder Mask"
+    },
+    {
+      "Type": "SolderPaste",
+      "Name": "Bottom Solder Paste"
+    },
+    {
+      "Type": "Legend",
+      "Name": "Bottom Silk Screen"
     }
   ]
 }
