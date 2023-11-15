@@ -10,10 +10,12 @@ license: MIT (software/Hardware)
 
 ## Release Versions
 ### Current
-  - v1.0 - Improved video circuit and TMS9118 schematic added.
+  - v2.1.0 - Improved video circuit for the TMS9118.
 
 ### Past
-  - v0.5 - First version with old video circuit.
+  - v2.0.0 - Improved video circuit that actually works.
+  - v1.0.0 - Improved video circuit and TMS9118 schematic added.
+  - v0.5.0 - First version with old video circuit.
   - none
   
 ## Requirements
@@ -29,8 +31,8 @@ license: MIT (software/Hardware)
 
   - docs - Data documents for various ICs.
   - schematic - KiCad schematic
-    - TMS9118 - Contains a schematic for a TMS9118 board with video circuit.
-    - TMS992X - Contains a schematic for a TMS992X board with video circuit.
+    - TMS9118 - Contains a schematic for a TMS9118 board with video circuit (v2).
+    - TMS992X - Contains a schematic for a TMS992X board with video circuit (v2).
   - src - Any source code for the project.
     - lib_picTMS99XX folder contains a library with test program for picerino. See readme.md in this directory for details.
 
@@ -41,7 +43,7 @@ license: MIT (software/Hardware)
   Through hole components were selected for everything, except for the video circuit of the TMS9118. This something I had on hand. Production uses a double sided board.
 
 ### Video Output
-  This video circuit is based on a few ideas. Mostly TI's application document, and TMS-RGB for the use of the LM1881. All other design choices are from application datasheets and just trial and error. Main issue with TMS-RGB being used whole sale is it has all surface mount components and it isn't universal for TMS9918. The goal of this project was to output component or composite to the retro tink x2. TI's application data sheet is keying out the Yr/Yb color bursts with a decoulping cap passing the signal to a 4066 that just went to ground during sync. This in theory should work fine, but in practice you'll still see a bit of the burst. TMS-RGB used a sample and hold method, which worked great to the converter chip. Problem came when passing that signal to a 6db gain opamp directly. Small differences would result in the new sampled part that was inserted during the color burst being offset and cause an over green issue. Plus it was more complicated then the TI grounding method. I wanted this down to 3 IC's at most. Realizing I could just use the switch to change to a new DC level I worked on the resulting circuit. The resulting circuit, on color burst, will switch from the video to the DC level set circuit and back and repeat. Originaly this was done with a zener and a pot, this turned out of be a source of contant pain if the voltage changed at all. The method came up with after was a slow op amp used to filter out anything over 15 khz and provide the DC offset from the Yb on its output. Also the jail bars were bad, which turned out to be switching noise from the LM1881. This is helped by isolating the CBURST line from the analog switch, a transistor will suffice. Though in this circuit a op amp is used due to one half used for the DC signal already.
+  This video circuit is based on a few ideas. Mostly TMS-RGB for the use of the LM1881. All other design choices are from application datasheets and just trial and error. Main issue with TMS-RGB being used whole sale is it has all surface mount components and it isn't universal for TMS9918. The goal of this project was to output component or composite to the retro tink x2. TI's application data sheet is keying out the Yr/Yb color bursts with a decoulping cap passing the signal to a 4066 that just went to ground during sync. This in theory should work fine, but in practice you'll still see a bit of the burst. TMS-RGB used a sample and hold method, which worked great to the converter chip. Taking the TMS RGB and just using a quad switch to sample the Yb signal, then pass it to the other inputs that then use that sample when needed (see lm1881 connections). This method of using a quad switch eliminates the too much blue issue. It also results in a circuit that is only 3 ic's. A MAX394, ADG813, and LM1881. The opamp is setup to rebalance the colors per the TMS RGB Y+Yr+Yb findings. Again big thanks to them for spending the time to document how and what they did. Saved me a lot of work on this project.
 
 ### Issues
   N/A
