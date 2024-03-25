@@ -2891,31 +2891,6 @@
     )
   )
 
-  (symbol (lib_id "power:VCC") (at 118.618 104.14 90) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
-    (uuid 00000000-0000-0000-0000-000062984f8a)
-    (property "Reference" "#PWR016" (at 122.428 104.14 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Value" "VCC" (at 115.3922 103.759 90)
-      (effects (font (size 1.27 1.27)) (justify left))
-    )
-    (property "Footprint" "" (at 118.618 104.14 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "" (at 118.618 104.14 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 2fa972b7-722f-4d1a-b8f3-2200569353de))
-    (instances
-      (project "TMS9118"
-        (path "/01e9b6e7-adf9-4ee7-9447-a588630ee4a2"
-          (reference "#PWR016") (unit 1)
-        )
-      )
-    )
-  )
-
   (symbol (lib_id "power:VSS") (at 99.568 120.65 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 00000000-0000-0000-0000-000062987876)
